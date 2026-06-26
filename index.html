@@ -1,0 +1,3210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leapfrog Remedies — 2027 DTC Cohort Forecast</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F2EC;
+  --bg-card:#ffffff;
+  --bg-card2:#f8fafc;
+  --border:#e2e8f0;
+  --text:#1A1A1A;
+  --muted:#64748b;
+  --dim:#9ca3af;
+  --header:#1C3D2A;
+  --green:#2D6A4F;
+  --green-light:#EAF3DE;
+  --red:#dc2626;
+  --red-light:#fef2f2;
+  --amber:#d97706;
+  --amber-light:#fffbeb;
+  --amber-border:#fde68a;
+  --blue:#2563eb;
+  --purple:#7c3aed;
+  --measured:#2563eb;
+  --inferred:#7c3aed;
+  --assumption:#d97706;
+  --decision:#2D6A4F;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+a{color:var(--blue)}
+
+header{background:var(--header);border-bottom:none;padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+header h1{font-size:16px;font-weight:700;flex:1;color:#fff}
+header .subtitle{font-size:12px;color:rgba(255,255,255,.65)}
+.header-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+.header-btn:hover{background:rgba(255,255,255,.2)}
+.header-btn.danger{border-color:rgba(252,165,165,.5);color:#fca5a5}
+.header-btn.primary{background:#fff;border-color:#fff;color:var(--header)}
+.header-btn.primary:hover{background:rgba(255,255,255,.9)}
+
+.warnings-bar{background:var(--amber-light);border-bottom:1px solid var(--amber-border);padding:7px 24px;display:none;font-size:12px;color:#92400e}
+.warnings-bar.visible{display:flex;align-items:center;gap:8px}
+.warnings-bar strong{font-weight:700}
+
+nav.tabs{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px}
+.tab-btn{background:none;border:none;color:var(--muted);padding:11px 16px;cursor:pointer;font-size:13px;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s}
+.tab-btn:hover{color:var(--text);background:var(--bg)}
+.tab-btn.active{color:var(--header);border-bottom-color:var(--header);font-weight:600}
+
+.tab-panel{display:none;padding:24px;max-width:1400px;margin:0 auto}
+.tab-panel.active{display:block}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr}.grid-3{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px}
+.card-value{font-size:24px;font-weight:700;color:var(--text)}
+.card-value.green{color:var(--green)}
+.card-value.red{color:var(--red)}
+.card-value.amber{color:var(--amber)}
+.card-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+.section-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)}
+.section-muted{font-size:12px;color:var(--muted);margin-bottom:16px}
+
+.chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.chart-wrap canvas{width:100%!important}
+.chart-title{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--header);color:#fff;font-weight:600;padding:8px 12px;text-align:right;white-space:nowrap;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+th:first-child{text-align:left}
+td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:var(--text)}
+td:first-child{text-align:left;color:var(--muted)}
+tr:nth-child(even) td{background:#f8fafc}
+tr:hover td{background:var(--green-light)}
+.tfoot-row td{font-weight:700;color:#fff;border-top:2px solid #0D2518;background:var(--header)}
+.highlight-row td{background:rgba(45,106,79,.06);font-weight:600}
+
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.table-wrap table{border:none}
+
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.badge-measured{background:rgba(37,99,235,.1);color:var(--measured)}
+.badge-inferred{background:rgba(124,58,237,.1);color:var(--inferred)}
+.badge-assumption{background:rgba(217,119,6,.12);color:var(--assumption)}
+.badge-decision{background:rgba(45,106,79,.12);color:var(--decision)}
+.badge-tbd{background:rgba(220,38,38,.1);color:var(--red)}
+
+.input-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.input-label{font-size:12px;color:var(--muted);min-width:160px}
+.inp{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:5px 9px;border-radius:5px;font-size:13px;width:120px}
+.inp:focus{outline:none;border-color:var(--header);box-shadow:0 0 0 2px rgba(28,61,42,.08)}
+.inp.tbd{border-color:var(--amber);background:var(--amber-light)}
+.inp-unit{color:var(--muted);font-size:12px}
+.inp-wide{width:180px}
+
+.slider-wrap{margin-bottom:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.slider-label{font-size:12px;font-weight:600;color:var(--text)}
+.slider-values{display:flex;align-items:center;gap:12px}
+.slider-val-box{text-align:center}
+.slider-val-box label{font-size:10px;color:var(--dim);display:block;margin-bottom:3px}
+.slider-val-box input[type=number]{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:4px 7px;border-radius:4px;font-size:13px;width:90px;text-align:center}
+.slider-val-box input[type=number].tbd{border-color:var(--amber);color:var(--amber)}
+.slider-arrow{color:var(--muted);font-size:16px}
+.slider-ramp{height:36px;position:relative;display:flex;align-items:flex-end;gap:2px;margin-top:10px}
+.ramp-bar{background:var(--header);opacity:.5;border-radius:2px 2px 0 0;flex:1;min-height:3px;transition:height .3s}
+
+.set-tbd-btn{font-size:10px;padding:2px 6px;border:1px solid var(--amber);color:var(--amber);background:none;border-radius:3px;cursor:pointer;margin-top:2px}
+.set-tbd-btn:hover{background:var(--amber-light)}
+
+.mb-8{margin-bottom:8px}
+.mb-16{margin-bottom:16px}
+.mb-24{margin-bottom:24px}
+.mt-16{margin-top:16px}
+.flex{display:flex}
+.gap-16{gap:16px}
+.items-center{align-items:center}
+
+.variance-positive{color:var(--green);font-weight:600}
+.variance-negative{color:var(--red);font-weight:600}
+.variance-zero{color:var(--muted)}
+
+.product-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.product-card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.product-badge{padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.05em}
+.badge-immune{background:rgba(37,99,235,.1);color:#2563eb}
+.badge-daily{background:rgba(45,106,79,.1);color:#2D6A4F}
+.badge-kids{background:rgba(124,58,237,.1);color:#7c3aed}
+.badge-wl{background:rgba(217,119,6,.12);color:#d97706}
+.badge-focus{background:rgba(6,182,212,.12);color:#0891b2}
+.badge-snooze{background:rgba(220,38,38,.1);color:#dc2626}
+.badge-winback{background:rgba(220,38,38,.1);color:#dc2626}
+
+.tbd-flag{background:var(--red-light);border:1px solid rgba(220,38,38,.25);border-radius:6px;padding:8px 12px;font-size:12px;color:#b91c1c;margin-bottom:12px}
+.tbd-flag strong{color:var(--red)}
+
+.inputs-table-wrap{overflow-x:auto}
+.inputs-table{width:100%;border-collapse:collapse;font-size:12px}
+.inputs-table th{background:var(--header);color:#fff;font-weight:600;padding:8px 12px;text-align:left;white-space:nowrap;position:sticky;top:0;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.inputs-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.inputs-table tr:nth-child(even) td{background:#f8fafc}
+.inputs-table tr:hover td{background:var(--green-light)}
+.inputs-table .inp-inline{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:4px 7px;border-radius:4px;font-size:12px;width:120px}
+.inputs-table .inp-inline.tbd{border-color:var(--amber);color:var(--amber)}
+.inp-notes{color:var(--muted);font-size:11px;max-width:260px;line-height:1.4}
+.inp-source{color:var(--muted);font-size:11px}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{background:var(--bg-card);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+.filter-btn.active{border-color:var(--header);color:var(--header);background:rgba(28,61,42,.07)}
+
+.note-box{background:var(--green-light);border:1px solid rgba(45,106,79,.25);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px}
+.note-box strong{color:var(--green)}
+
+.cohort-matrix-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-top:16px}
+.cohort-matrix{border-collapse:collapse;font-size:11px;min-width:800px}
+.cohort-matrix th{background:var(--header);color:#fff;padding:7px 8px;text-align:right;border:1px solid rgba(28,61,42,.25);white-space:nowrap;font-size:10px}
+.cohort-matrix th.col-label{text-align:left;min-width:80px}
+.cohort-matrix td{padding:5px 8px;text-align:right;border:1px solid var(--border);font-size:11px;white-space:nowrap}
+.cohort-matrix td.zero{color:var(--dim)}
+.cohort-matrix td.first-order{background:rgba(37,99,235,.08);color:#1d4ed8;font-weight:600}
+.cohort-matrix .total-row td{font-weight:700;background:var(--header);color:#fff;border-top:2px solid #0D2518}
+.cohort-matrix .total-col{font-weight:600;background:rgba(45,106,79,.07);color:var(--green)}
+
+select.inp{appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%2364748b' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+
+.hidden{display:none}
+details[open] summary span:first-child{transform:rotate(90deg);display:inline-block}
+
+#import-file-input{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Leapfrog Remedies — 2027 DTC Cohort Forecast</h1>
+    <div class="subtitle">Bottom-up monthly cohort model · DTC only · No shared state with H2 2026 model</div>
+  </div>
+  <button class="header-btn" onclick="exportModel()">Export JSON</button>
+  <button class="header-btn" onclick="document.getElementById('import-file-input').click()">Import JSON</button>
+  <input type="file" id="import-file-input" accept=".json" onchange="importModel(event)">
+  <button class="header-btn danger" onclick="resetModel()">Reset</button>
+</header>
+
+<div id="warnings-bar" class="warnings-bar">
+  <span id="warn-items"></span>
+</div>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+  <button class="tab-btn" data-tab="cohort">Cohort Engine</button>
+  <button class="tab-btn" data-tab="products">Product Lines</button>
+  <button class="tab-btn" data-tab="winback">SNOOZE</button>
+  <button class="tab-btn" data-tab="affiliates">Affiliates</button>
+  <button class="tab-btn" data-tab="reddit">Reddit</button>
+  <button class="tab-btn" data-tab="seo">SEO</button>
+  <button class="tab-btn" data-tab="acquisition">Acquisition</button>
+  <button class="tab-btn" data-tab="inputs">Model Inputs</button>
+</nav>
+
+<div id="tab-dashboard" class="tab-panel active"></div>
+<div id="tab-cohort" class="tab-panel"></div>
+<div id="tab-products" class="tab-panel"></div>
+<div id="tab-winback" class="tab-panel"></div>
+<div id="tab-affiliates" class="tab-panel"></div>
+<div id="tab-reddit" class="tab-panel"></div>
+<div id="tab-seo" class="tab-panel"></div>
+<div id="tab-acquisition" class="tab-panel"></div>
+<div id="tab-inputs" class="tab-panel"></div>
+
+<script>
+'use strict';
+
+/* ─── CONSTANTS ──────────────────────────────────────────────── */
+const STORAGE_KEY = 'leapfrog_2027_dtc_cohort_v7';
+const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const SEAS = [.086,.070,.060,.053,.061,.051,.052,.058,.100,.097,.123,.187]; // 2025 monthly share
+
+// IMMUNE-only carry-forward — precomputed from DB-confirmed monthly cohort analysis (Jun 2026).
+// Source: 26 confirmed cohorts (May 2024–Jun 2026, 10,542 customers) + 6 estimated H2 2026 cohorts
+// (331/month × 6 = 1,986 customers). IMMUNE product IDs only: {8070861455651, 8068687069475}.
+// FOCUS (15005627875706) and DAILY (15796411433338) stripped so those streams add cleanly on top.
+//   Phase 1 (M4–M7): IMMUNE-only per-original-member anchors [£11.05, £9.00, £9.37, £8.38]
+//   Phase 2 (M8+):   £8.15/member × (1–0.010)^(elapsed–8) (1%/month conservative; empirical ≈0%)
+// Annual total: £1,080,029. Previous all-products total: £1,128,792 (FOCUS/DAILY embedded = £48,763).
+const HIST_CF_MONTHLY = [99322,96774,94374,92455,90696,89595,88355,87422,86548,85683,84826,83978];
+
+// Two-phase empirical post-M3 decay parameters (calibrated Jun 2026, IMMUNE-only orders).
+// Source: 31,828 orders; IMMUNE product IDs {8070861455651, 8068687069475} only (96.6% of orders).
+// FOCUS/DAILY/other orders excluded so carry-forward is IMMUNE-specific — those streams are additive.
+// Phase 1: per-original-member IMMUNE revenue, n≥7,265 per elapsed month.
+// Phase 2: M8–M20 near-flat (~0%/month empirical); 1%/month applied conservatively.
+const POST_M3_PHASE1 = {4: 11.05, 5: 9.00, 6: 9.37, 7: 8.38}; // £/orig member, IMMUNE-only
+const POST_M3_M8_ANCHOR = 8.15;     // £/orig member at M8, IMMUNE-only (n=6,483 across 18 cohorts)
+const POST_M3_PHASE2_DECAY = 0.010; // 1%/month conservative (empirical M8–M20: ~0%, flat)
+
+/* ─── INPUT METADATA ─────────────────────────────────────────── */
+// Each entry: { label, category, defaultValue, unit, min, max, step, source, notes, review_date, tbd? }
+// tbd:true = default is null/unset, must be explicitly entered
+
+const INPUT_META = {
+  // === ACQUISITION
+  targetNewCustomers2027: {
+    label:'2027 Target New Customers (Annual)',
+    category:'decision',
+    defaultValue:12479,
+    unit:'customers',
+    min:1000,max:100000,step:100,
+    source:'Back-solved Jun 2026 — S3 scenario, IMMUNE-only carry-forward, clean stream separation',
+    notes:'Back-solved to hit £2,894,577 DTC target at S3 retention (m1 22%, r3 44%). 12,479 = residual gap ÷ avg year-1 LTV per NC (£116.04). Represents +154% vs DB 4,912 2025 baseline — acquisition is the primary lever. Adjust this input to model different NC scenarios; implied budget and growth % update automatically.',
+    review_date:'2027-Q1'
+  },
+  base2026NewCustomers: {
+    label:'2026 Estimated Full-Year NCs (Acquisition Multiplier Base)',
+    category:'inferred',
+    defaultValue:3970,
+    unit:'customers',
+    min:500,max:50000,step:10,
+    source:'H1 2026 DB-confirmed (Jan–May 1,901 + Jun 83 = 1,984) + H2 proxy (Jul–Dec 331/mo × 6 = 1,986)',
+    notes:'2026 estimated full-year NC total — used as denominator for the ×3.1 acquisition multiplier. H1 (Jan–Jun) = 1,984 DB-confirmed. H2 (Jul–Dec) = 1,986 estimated at 331/month proxy (H1 run-rate). Total: 3,970. Update to confirmed full-year figure once H2 2026 actuals land (target: Q1 2027 refresh). If H2 underdelivers vs plan, this figure falls and the 2027 multiplier rises accordingly.',
+    review_date:'2027-Q1'
+  },
+  blendedCAC: {
+    label:'Blended CAC',
+    category:'measured',
+    defaultValue:48.46,
+    unit:'£',
+    min:10,max:200,step:0.01,
+    source:'2026 H2 actuals',
+    notes:'2026 H2 blended CAC rolled forward as 2027 baseline. Confirm whether any efficiency target should be built in for 2027.',
+    review_date:'2027-01-01'
+  },
+  newCustomerAOV: {
+    label:'New Customer AOV',
+    category:'measured',
+    defaultValue:60,
+    unit:'£',
+    min:20,max:200,step:0.5,
+    source:'2026 actuals',
+    notes:'First-order AOV for all new customers (blended across OTP and subscription). Used for acquisition-month revenue.',
+    review_date:'2027-Q1'
+  },
+  repeatOrderAOV: {
+    label:'Repeat / Subscription Order AOV',
+    category:'assumption',
+    defaultValue:58,
+    unit:'£',
+    min:20,max:200,step:0.5,
+    source:'Estimated — slight sub discount vs first order',
+    notes:'AOV for months M1+. Assumed slightly below first-order AOV. Update with actual subscription order value once available.',
+    review_date:'2027-Q1'
+  },
+  paidMediaShare: {
+    label:'Paid Media Share of New Customers',
+    category:'assumption',
+    defaultValue:0.60,
+    unit:'%',
+    min:0,max:1,step:0.01,
+    source:'Directional estimate',
+    notes:'REPORTING LAYER ONLY — does not affect CAC or volume math. Adjust per actual channel attribution. Must sum to 100% with SEO + GEO.',
+    review_date:'2027-Q1'
+  },
+  seoShare: {
+    label:'SEO Share of New Customers',
+    category:'assumption',
+    defaultValue:0.25,
+    unit:'%',
+    min:0,max:1,step:0.01,
+    source:'Directional estimate',
+    notes:'Reporting layer only.',
+    review_date:'2027-Q1'
+  },
+  geoShare: {
+    label:'GEO Share of New Customers',
+    category:'assumption',
+    defaultValue:0.15,
+    unit:'%',
+    min:0,max:1,step:0.01,
+    source:'Directional estimate',
+    notes:'Reporting layer only. Paid + SEO + GEO should sum to 100%.',
+    review_date:'2027-Q1'
+  },
+
+  // === RETENTION RAMPS
+  m1RetentionStart: {
+    label:'M1 Retention — 2026 Baseline',
+    category:'measured',
+    defaultValue:0.175,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Growth Room — confirmed actuals (Jun 2026)',
+    notes:'Blended M1 retention across all new customers (OTP + sub combined). 2026 run-rate ~17–19% (Jan–Apr 2026). Trend: May–Jun 2024 27–32% (early adopters); Jul–Dec 2024 10–25% (OTP surge); Jan–Sep 2025 10–14% (trough); Oct–Dec 2025 25–29% (Q4 recovery); Jan–Apr 2026 15–19% (post-holiday softening, above 2025 trough). Using 17.5% as Jan 2027 starting value — midpoint of current run-rate.',
+    review_date:'2027-Q1'
+  },
+  m1RetentionEnd: {
+    label:'M1 Retention — 2027 End-State (S3 working case)',
+    category:'decision',
+    defaultValue:0.22,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Back-solved Jun 2026 — S3 scenario (modest/plausible)',
+    notes:'S3 WORKING CASE: 22% (+4.5pp from 17.5% baseline). Achievable via CRM/onboarding intervention — aggressive-but-plausible for a single year. S9 CEILING (very ambitious, requires demonstrable mechanism): 35% (+17.5pp). Change this input to 0.35 to model the S9 ceiling — use as sensitivity only, not a working forecast. BACK-SOLVE CONTEXT: at 15,000 new customers, S3 retention produces ~£2,587k total (£308k short of target); S9 produces ~£2,692k (£203k short). Neither closes the gap alone — model is acquisition-volume-dependent. See dashboard "Implied Required NC" for the derived acquisition requirement.',
+    review_date:'2027-Q2'
+  },
+  retention60_90Start: {
+    label:'60–90 Day Retention — 2026 Baseline (90-day)',
+    category:'measured',
+    defaultValue:0.362,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Growth Room — confirmed Jun 2026 (org 91908a1a-192d-4a2c-b6dd-ed0b8441ceb9)',
+    notes:'% of first-time buyers who made a second purchase within 90 days (first-to-second retention). Confirmed data: 60-day = 29.9% (10,129 eligible), 90-day = 36.2% (9,806 eligible). Using 90-day figure (36.2%) as the month-3 survival anchor in the cohort engine. Incremental 6pp between day 60 and day 90 reflects customers on ~6–8 week reorder cycles. The model linearly interpolates between M1 (17.5%) and this M3 anchor, giving M2 ≈ 26.9% — broadly consistent with the observed 60-day rate of 29.9%.',
+    review_date:'2027-Q2'
+  },
+  retention60_90End: {
+    label:'90-Day Retention — 2027 End-State (S3 working case)',
+    category:'decision',
+    defaultValue:0.44,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Back-solved Jun 2026 — S3 scenario (modest/plausible)',
+    notes:'S3 WORKING CASE: 44% (+7.8pp from 36.2% baseline). Solid and achievable via ongoing retention/reactivation activity — well within UK DTC subscription benchmarks (45–60%). S9 CEILING (plausible upper bound, top of UK benchmark range): 55% (+18.8pp). Change this input to 0.55 to model the S9 ceiling. BACK-SOLVE CONTEXT: improvement from S3→S9 reduces required new customers by only ~913 (5%). Retention drives value at the margin; acquisition volume is the primary lever. See dashboard "Implied Required NC".',
+    review_date:'2027-Q2'
+  },
+  subRateAtAcquisitionStart: {
+    label:'Subscription Rate at Acquisition — Start',
+    category:'measured',
+    defaultValue:0.17,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'2026 actuals',
+    notes:'% of new customers choosing subscription at point of acquisition. Jan 2027 baseline. Confirmed.',
+    review_date:'2027-Q1'
+  },
+  subRateAtAcquisitionEnd: {
+    label:'Subscription Rate at Acquisition — 2027 Target',
+    category:'decision',
+    defaultValue:0.30,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Confirmed 2027 target',
+    notes:'Target sub rate at acquisition by Dec 2027. Confirmed in brief.',
+    review_date:'2027-Q3'
+  },
+  ordersFromActiveSubsStart: {
+    label:'Orders from Active Subscriptions — Start',
+    category:'measured',
+    defaultValue:0.49,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'2026 actuals',
+    notes:'% of all orders coming from active subscription renewals (vs OTP). Jan 2027 baseline. Used for OTP/subscription revenue split reporting.',
+    review_date:'2027-Q1'
+  },
+  ordersFromActiveSubsEnd: {
+    label:'Orders from Active Subscriptions — 2027 Target',
+    category:'decision',
+    defaultValue:0.75,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Confirmed 2027 target',
+    notes:'Target % of orders from subscriptions by Dec 2027. Confirmed in brief.',
+    review_date:'2027-Q3'
+  },
+  rampFlatteningFactor: {
+    label:'Metric Ramp Flattening Factor',
+    category:'assumption',
+    defaultValue:0.5,
+    unit:'',
+    min:0,max:1,step:0.05,
+    source:'Model design — brief specifies dampened seasonality for metric ramps',
+    notes:'0 = raw 2025 seasonality used as ramp interpolation weights. 1 = linear monthly steps. 0.5 = blend. Applies to the 4 behavioural metrics only, not acquisition volume or product revenue.',
+    review_date:'2027-Q1'
+  },
+  ongoingMonthlyChurnRate: {
+    label:'Post-M3 Churn Rate [REFERENCE ONLY — not used in survival model]',
+    category:'inferred',
+    defaultValue:0.1362,
+    unit:'%',
+    min:0,max:0.5,step:0.001,
+    source:'2026 lapsed cohort analysis (order-count 5→6 transition)',
+    notes:'REFERENCE ONLY — no longer drives the IMMUNE or carry-forward computation. Replaced by two-phase empirical decay (getRevPerMember). The 13.62%/month figure was derived from order-count 5→6 transition probability and applied as a calendar-month rate — empirically wrong. Actual full-cohort unconditional revenue decays at ~8.9%/month M4–M7 (less-committed early leavers), then near-zero M8–M15. 13.62%/month understated M9+ revenue by 30–63%, worsening with tenure.',
+    review_date:'2027-Q2'
+  },
+  postM3M8AnchorRev: {
+    label:'Post-M3 M8 Revenue Anchor (£/orig member, r3=36.2%)',
+    category:'inferred',
+    defaultValue:8.15,
+    unit:'£/member',
+    min:0,max:50,step:0.01,
+    source:'DB-confirmed full-cohort analysis, Jun 2026 (31,721 orders, n≥4,246 per cohort month)',
+    notes:'IMMUNE-only (product IDs 8070861455651, 8068687069475) revenue per original member at elapsed month 8, n=6,483 across 18 cohorts. FOCUS/DAILY stripped. Apply scaling factor (r3_cohort/0.362) for other scenarios. LOCKED — do not adjust without re-running full cohort analysis from DB.',
+    review_date:'2027-Q1'
+  },
+  postM3Phase2DecayRate: {
+    label:'Post-M3 Phase 2 Revenue Decay Rate (M8+)',
+    category:'inferred',
+    defaultValue:0.010,
+    unit:'%/month',
+    min:0,max:0.1,step:0.001,
+    source:'Conservative modelling choice — empirical M8–M15 decay ≈0%/month',
+    notes:'Monthly revenue decay applied from M8 onward. Empirical observation M8–M15: near-zero (0–1%/month). 1% chosen conservatively. M20–M24 data excluded — selection bias (only most loyal early adopters observable; apparent revenue increase is not real population decay). Update if full-population M16+ data becomes available.',
+    review_date:'2027-Q1'
+  },
+
+  // === DAILY
+  dailyRunRatePerDay: {
+    label:'DAILY Run Rate (£/day)',
+    category:'measured',
+    defaultValue:338,
+    unit:'£/day',
+    min:0,max:10000,step:1,
+    source:'DAILY trading data — 44 days post-launch (6 May 2026)',
+    notes:'197 orders / £14,893 revenue across 44 days. Range: 1–18 orders/day (volatile). Treat as directional only — too early for reliable run rate. Review at Q3 2026.',
+    review_date:'2026-09-01'
+  },
+  dailyAnnualGrowthRate: {
+    label:'DAILY Annual Growth Rate',
+    category:'assumption',
+    defaultValue:0.20,
+    unit:'%',
+    min:0,max:2,step:0.01,
+    source:'First-pass estimate — no full-year DAILY data yet',
+    notes:'Annualised growth rate applied to DAILY monthly revenue into 2027. Review once DAILY has 3+ months trading data.',
+    review_date:'2027-Q1'
+  },
+  dailySubRate: {
+    label:'DAILY Subscription Rate',
+    category:'measured',
+    defaultValue:0.558,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'DAILY trading data — 44 days (55.8% overall / 56.1% last 30 days)',
+    notes:'Stable — no shift since launch. Used as DAILY sub rate starting assumption for 2027. Also default for KIDS and WEIGHT LOSS until each has trading data.',
+    review_date:'2026-09-01'
+  },
+  dailySeasonalityDampening: {
+    label:'Product Lines Seasonality Dampening',
+    category:'assumption',
+    defaultValue:0.5,
+    unit:'',
+    min:0,max:1,step:0.05,
+    source:'Model design — DAILY designed to dampen Q4 concentration',
+    notes:'Applies to DAILY, FOCUS, KIDS, and WEIGHT LOSS revenue curves. 0 = raw seasonality, 1 = flat. These products are year-round so use a higher factor than core IMMUNE acquisition (which uses 0 = raw).',
+    review_date:'2027-Q1'
+  },
+
+  // === FOCUS
+  focusRunRatePerDay: {
+    label:'FOCUS Run Rate (£/day)',
+    category:'measured',
+    defaultValue:150,
+    unit:'£/day',
+    min:0,max:5000,step:1,
+    source:'FOCUS trading data — 13 months post-launch (May 2025 – Jun 2026)',
+    notes:'604 orders / £60,356 revenue / ~400 days = 1.5 orders/day average. AOV: £60,356 ÷ 604 = £99.93 ≈ £100. Run rate = 1.5 × £100 = £150/day. This is the full-period average — no monthly breakdown available to determine trend direction. Treat as observation-point run rate at Jun 2026. Review once monthly data is extracted.',
+    review_date:'2026-09-01'
+  },
+  focusAOV: {
+    label:'FOCUS Order AOV',
+    category:'measured',
+    defaultValue:99.93,
+    unit:'£',
+    min:10,max:300,step:0.01,
+    source:'FOCUS trading data — derived: £60,356 ÷ 604 orders',
+    notes:'Observed blended AOV (OTP + subscription combined). ~£100. Update once subscription vs OTP AOV split is available from Growth Room.',
+    review_date:'2026-09-01'
+  },
+  focusAnnualGrowthRate: {
+    label:'FOCUS Annual Growth Rate (2027)',
+    category:'assumption',
+    defaultValue:0.15,
+    unit:'%',
+    min:0,max:2,step:0.01,
+    source:'Planning assumption — no monthly trend data available',
+    notes:'Annualised growth rate applied from Jun 2026 run rate forward to Jan 2027, then through 2027. 15% is conservative for a product with 13 months of trading history. Review once monthly revenue breakdown is available to observe actual growth trajectory.',
+    review_date:'2027-Q1'
+  },
+  focusSubRate: {
+    label:'FOCUS Subscription Rate',
+    category:'measured',
+    defaultValue:0.407,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'FOCUS trading data — overall 13-month rate (40.7%)',
+    notes:'STRUCTURAL BASELINE — deliberately using overall 40.7%, NOT last-30-day 60.0%. The recent spike to 60.0% is a composition effect: OTP volume has declined, inflating the subscription share of a smaller total. It does not represent real subscription growth. Using 60.0% as a forward assumption would overstate retention quality and future revenue. 40.7% is the correct structural baseline for 2027 modelling.',
+    review_date:'2027-Q1'
+  },
+
+  // === KIDS
+  kidsLaunchMonth: {
+    label:'KIDS Launch Month (0=Jan)',
+    category:'decision',
+    defaultValue:0,
+    unit:'index',
+    min:0,max:11,step:1,
+    source:'Q1 2027 confirmed',
+    notes:'Month index: 0=Jan, 1=Feb, ..., 11=Dec. Q1 2027 planned — set to 0 (January) as placeholder.',
+    review_date:'2026-09-01'
+  },
+  kidsInitialMonthlyRevenue: {
+    label:'KIDS Initial Monthly Revenue',
+    category:'assumption',
+    defaultValue:5000,
+    unit:'£',
+    min:0,max:100000,step:500,
+    source:'Modelled on DAILY early trajectory — not yet observed',
+    notes:'ASSUMPTION: First full month revenue after KIDS launch. Based on DAILY early curve shape. Review immediately at +2 months post-launch.',
+    review_date:'2027-03-01'
+  },
+  kidsMonthlyGrowthRate: {
+    label:'KIDS Month-on-Month Growth Rate',
+    category:'assumption',
+    defaultValue:0.08,
+    unit:'%',
+    min:0,max:0.5,step:0.01,
+    source:'Modelled on DAILY trajectory — not yet observed',
+    notes:'Monthly compounding growth rate applied to KIDS from launch. Decelerates as it matures. Review at +2 months post-launch.',
+    review_date:'2027-03-01'
+  },
+  kidsSubRate: {
+    label:'KIDS Subscription Rate at Acquisition',
+    category:'assumption',
+    defaultValue:0.558,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Defaulted to DAILY observed rate',
+    notes:'Expected sub rate for KIDS product. Using DAILY 55.8% as starting assumption. Update once KIDS has trading data.',
+    review_date:'2027-03-01'
+  },
+
+  // === WEIGHT LOSS
+  weightLossLaunchMonth: {
+    label:'WEIGHT LOSS Launch Month (0=Jan)',
+    category:'decision',
+    defaultValue:3,
+    unit:'index',
+    min:0,max:11,step:1,
+    source:'Early Q2 2027 confirmed',
+    notes:'Month index: 0=Jan, ..., 11=Dec. April (index 3) = early Q2.',
+    review_date:'2026-10-01'
+  },
+  weightLossInitialMonthlyRevenue: {
+    label:'WEIGHT LOSS Initial Monthly Revenue',
+    category:'assumption',
+    defaultValue:4000,
+    unit:'£',
+    min:0,max:100000,step:500,
+    source:'Modelled on DAILY early trajectory — not yet observed',
+    notes:'ASSUMPTION: First full month revenue post-launch. Review at +2 months post-launch.',
+    review_date:'2027-06-01'
+  },
+  weightLossMonthlyGrowthRate: {
+    label:'WEIGHT LOSS Month-on-Month Growth Rate',
+    category:'assumption',
+    defaultValue:0.08,
+    unit:'%',
+    min:0,max:0.5,step:0.01,
+    source:'Modelled on DAILY trajectory',
+    notes:'Monthly compounding growth rate. Review post-launch.',
+    review_date:'2027-06-01'
+  },
+  weightLossSubRate: {
+    label:'WEIGHT LOSS Subscription Rate at Acquisition',
+    category:'assumption',
+    defaultValue:0.558,
+    unit:'%',
+    min:0,max:1,step:0.001,
+    source:'Defaulted to DAILY observed rate',
+    notes:'Update once WEIGHT LOSS has trading data.',
+    review_date:'2027-06-01'
+  },
+
+  // === SNOOZE (ongoing reactivation — distinct from Relo Winback which is NOT modelled here)
+  lapsedOTPBase: {
+    label:'SNOOZE Eligible Base (Jan 2027)',
+    category:'measured',
+    defaultValue:7761,
+    unit:'customers',
+    min:0,max:20000,step:50,
+    source:'Order data — customer-level rollup, 10,542 unique customers, 31,721 orders (Jun 2026). 2,620 active ≤90d; 7,761 lapsed 91–730d; 161 dormant >730d.',
+    notes:'CEILING, NOT WORKING ASSUMPTION: 7,761 active-lapsed customers (91–730 days since last order by shopify_customer_id, across all products) from full order history as of 19 Jun 2026. This is a customer-level rollup — a customer who ordered IMMUNE in March and FOCUS in May counts once from May. Real reachable count will be lower once Klaviyo suppression/unsubscribe status is applied — not yet measurable from this data source. Treat 7,761 as upper bound only. Previous figure (2,952) was product-scoped, not customer-level — that was an undercount. RELO WINBACK IS SEPARATE: Relo Winback (~330 recipients/message, ~0.50% blended CVR) runs independently and is NOT modelled in this file. SNOOZE is the only win-back contributor modelled here.',
+    review_date:'2027-Q1'
+  },
+  snoozeReachablePct: {
+    label:'SNOOZE Reachable Fraction (Klaviyo)',
+    category:'assumption',
+    defaultValue:0.30,
+    unit:'%',
+    min:0,max:1,step:0.05,
+    source:'ASSUMPTION — Klaviyo suppression/unsubscribes not measured against lapsed file',
+    notes:'Fraction of the 7,761 lapsed ceiling estimated to be reachable via Klaviyo after suppression/unsubscribes are applied. 30% (≈ 2,330) is a conservative planning estimate — the actual figure is unknown until a Klaviyo export is matched against the lapsed customer list. Working pool = lapsedOTPBase × this fraction. FLAGGED SIMPLIFICATION: pool is depleted by reactivations each month and replenished only by new customers crossing the 90-day lapsed threshold (estimated via lapsedGrowthMonthlyRate). Review Q2 2027 once Klaviyo export is available.',
+    review_date:'2027-Q2'
+  },
+  winbackMonthlyReactivationRate: {
+    label:'SNOOZE Monthly Reactivation Rate',
+    category:'assumption',
+    defaultValue:0.0015,
+    unit:'%',
+    min:0,max:0.05,step:0.0005,
+    source:'PLANNING ASSUMPTION — no ongoing SNOOZE cadence data exists',
+    notes:'PLANNING ASSUMPTION — no ongoing-cadence data exists yet. Applied to the working reachable pool (not the 7,761 ceiling). Reference points (not direct benchmarks): Q4 2026 one-off SNOOZE blast = 0.35% CVR (single targeted message, 1,144 recipients); Relo Winback = ~0.50% blended multi-touch CVR (~330 recipients/message). Both of those were against smaller, more targeted sends. An ongoing monthly cadence to a larger, less-targeted pool should perform below those reference points — default 0.15%/month is deliberately at the conservative end. Reactivation rate and pool mechanic are both unvalidated. Review Q2 2027 once at least 2–3 months of the relaunched SNOOZE flow have run.',
+    review_date:'2027-Q2'
+  },
+  winbackAOV: {
+    label:'SNOOZE Reactivation AOV',
+    category:'assumption',
+    defaultValue:55,
+    unit:'£',
+    min:10,max:200,step:0.5,
+    source:'Estimated — slight discount vs new customer AOV',
+    notes:'AOV for SNOOZE-reactivated lapsed customers. Assumed slightly below new customer AOV (£60). Update with actuals once ongoing SNOOZE flow has run.',
+    review_date:'2027-Q2'
+  },
+  lapsedGrowthMonthlyRate: {
+    label:'SNOOZE Pool Monthly Replenishment Rate',
+    category:'inferred',
+    defaultValue:0.01,
+    unit:'%',
+    min:0,max:0.1,step:0.005,
+    source:'Inferred from cohort churn assumptions — not directly measured',
+    notes:'Monthly rate applied to the working reachable pool to estimate new customers crossing the 90-day lapsed threshold each month. At 1% of 2,330 ≈ 23 new reachable lapsers/month — consistent with ~5% monthly churn on the active base (2,620 active × 5% churn × 30% Klaviyo-reachable fraction ≈ 39, so 23 is conservative). Replenishment is capped: pool cannot exceed the working ceiling (lapsedOTPBase × snoozeReachablePct). Previously 5%/month against the full 7,761 — that was ~388/month new lapsers which swamped the 0.3% depletion rate and caused the pool to compound upward instead of deplete.',
+    review_date:'2027-Q2'
+  },
+
+  // === CARRY-FORWARD COHORT (REFERENCE — model uses precomputed HIST_CF_MONTHLY constant)
+  histCohortH2ProxyNcPerMonth: {
+    label:'H2 2026 Cohort Proxy NC/Month (Jul–Dec 2026)',
+    category:'inferred',
+    defaultValue:331,
+    unit:'customers/month',
+    min:0,max:1000,step:1,
+    source:'H1 2026 run-rate from DB (Jan–Jun 2026: 1,986 confirmed ÷ 6 = 331/month)',
+    notes:'NC per month assumed for the 6 estimated H2 2026 cohorts (Jul–Dec 2026). H1 2026 run-rate (331/month) used as flat proxy — no actual order data available yet for Jul–Dec 2026. Combined with 26 confirmed cohorts (May 2024–Jun 2026, 10,542 customers) to build full historical carry-forward stream via survival analysis. REFERENCE ONLY: this value documents the assumption embedded in HIST_CF_MONTHLY. Changing it here does NOT update the model — the carry-forward array is precomputed from full DB cohort data and locked in HIST_CF_MONTHLY. Regenerate from DB when Jul–Dec 2026 actuals are available (target: Q1 2027 refresh).',
+    review_date:'2027-Q1'
+  },
+
+  // === TARGETS & REFERENCE
+  dtcTarget2027: {
+    label:'2027 DTC Revenue Target (Top-Down)',
+    category:'measured',
+    defaultValue:2894577,
+    unit:'£',
+    min:0,max:10000000,step:1000,
+    source:'Revenue Forecast Condensed P&L',
+    notes:'TOP-DOWN CHECK ONLY — not an input that drives the model. Bottom-up build is compared against this for variance. Total revenue target £3,254,577; B2B £360k out of scope here.',
+    review_date:'2026-09-01'
+  },
+  plan2026Revenue: {
+    label:'2026 Plan Revenue (Reference)',
+    category:'measured',
+    defaultValue:1672710,
+    unit:'£',
+    min:0,max:5000000,step:1000,
+    source:'Condensed P&L — NEEDS RECONCILIATION',
+    notes:'Condensed P&L shows £1,672,710. Some session figures show £1,587,315 full-year. Reconcile before using as cohort engine baseline. Not a model driver — reference only.',
+    review_date:'2026-07-01'
+  },
+
+  // === EFFICIENCY LEVERS
+  croUplift: {
+    label:'CRO Improvement',
+    category:'assumption',
+    defaultValue:0,
+    unit:'%',
+    min:0,max:0.50,step:0.01,
+    source:'Efficiency lever — not yet observed',
+    notes:'CVR uplift multiplier on the 3.17% baseline CVR. Same sessions, higher conversion → more NCs without additional media spend. Increases effective NC count by (1 + uplift) while holding implied budget fixed. 0% = no improvement (default).',
+    review_date:'2027-Q1'
+  },
+  crmRetentionUplift: {
+    label:'CRM Retention Rate Improvement',
+    category:'assumption',
+    defaultValue:0,
+    unit:'%',
+    min:0,max:0.20,step:0.01,
+    source:'Efficiency lever — not yet observed',
+    notes:'% uplift applied on top of the M1 and 90-day retention end-state targets. Multiplies both end-state targets by (1 + uplift). 0% = no improvement beyond the S3 working case targets already set.',
+    review_date:'2027-Q1'
+  },
+  crmSubConvUplift: {
+    label:'CRM Subscription Conversion Improvement',
+    category:'assumption',
+    defaultValue:0,
+    unit:'%',
+    min:0,max:0.20,step:0.01,
+    source:'Efficiency lever — not yet observed',
+    notes:'% uplift applied on top of the subscription rate at acquisition end-state target. Multiplies the target sub rate by (1 + uplift). 0% = no improvement beyond the confirmed 17%→30% target.',
+    review_date:'2027-Q1'
+  },
+
+  // ── Affiliates ─────────────────────────────────────────────────
+  affiliatesNanoCount: {
+    label:'Affiliates — Nano Creator Count', category:'assumption', defaultValue:50,
+    unit:'creators', min:0, max:500, step:5,
+    source:'Working assumption — not yet contracted',
+    notes:'Number of nano creators (<10k followers) in the affiliate programme.', review_date:'2027-Q1'
+  },
+  affiliatesNanoNCs: {
+    label:'Affiliates — Nano NCs/Creator/yr', category:'assumption', defaultValue:8,
+    unit:'NCs', min:0, max:50, step:1,
+    source:'Working assumption', notes:'Expected new customers per nano creator per year.', review_date:'2027-Q1'
+  },
+  affiliatesMicroCount: {
+    label:'Affiliates — Micro Creator Count', category:'assumption', defaultValue:20,
+    unit:'creators', min:0, max:200, step:5,
+    source:'Working assumption', notes:'Number of micro creators (10k–100k followers).', review_date:'2027-Q1'
+  },
+  affiliatesMicroNCs: {
+    label:'Affiliates — Micro NCs/Creator/yr', category:'assumption', defaultValue:25,
+    unit:'NCs', min:0, max:100, step:1,
+    source:'Working assumption', notes:'Expected new customers per micro creator per year.', review_date:'2027-Q1'
+  },
+  affiliatesHCPCount: {
+    label:'Affiliates — HCP Creator Count', category:'assumption', defaultValue:10,
+    unit:'creators', min:0, max:100, step:1,
+    source:'Working assumption', notes:'Number of healthcare professional creators.', review_date:'2027-Q1'
+  },
+  affiliatesHCPNCs: {
+    label:'Affiliates — HCP NCs/Creator/yr', category:'assumption', defaultValue:15,
+    unit:'NCs', min:0, max:100, step:1,
+    source:'Working assumption', notes:'Expected new customers per HCP creator per year.', review_date:'2027-Q1'
+  },
+  affiliatesMediaCount: {
+    label:'Affiliates — Media Creator Count', category:'assumption', defaultValue:5,
+    unit:'creators', min:0, max:50, step:1,
+    source:'Working assumption', notes:'Number of media/publisher affiliate partners.', review_date:'2027-Q1'
+  },
+  affiliatesMediaNCs: {
+    label:'Affiliates — Media NCs/Creator/yr', category:'assumption', defaultValue:40,
+    unit:'NCs', min:0, max:200, step:5,
+    source:'Working assumption', notes:'Expected new customers per media partner per year.', review_date:'2027-Q1'
+  },
+  affiliatesCommissionRate: {
+    label:'Affiliates — Commission Rate', category:'assumption', defaultValue:0.13,
+    unit:'%', min:0.08, max:0.20, step:0.01,
+    source:'Industry standard 8–20%', notes:'Commission on first order value; drives effective CAC.', review_date:'2027-Q1'
+  },
+  affiliatesAvgFirstOrder: {
+    label:'Affiliates — Avg First Order Value', category:'assumption', defaultValue:35,
+    unit:'£', min:15, max:75, step:1,
+    source:'IMMUNE blended AOV proxy', notes:'Average first order value used to compute commission per order.', review_date:'2027-Q1'
+  },
+  affiliatesPlatformFeeAnnual: {
+    label:'Affiliates — Platform Fee (annual)', category:'assumption', defaultValue:0,
+    unit:'£', min:0, max:5000, step:50,
+    source:'Working assumption — not yet contracted', notes:'Annual platform/network fee spread across all affiliate NCs to give true blended CAC.', review_date:'2027-Q1'
+  },
+
+  // ── Reddit ─────────────────────────────────────────────────────
+  redditPhase1Spend: {
+    label:'Reddit — Phase 1 Spend (Jan–Feb)', category:'assumption', defaultValue:3000,
+    unit:'£', min:0, max:20000, step:500,
+    source:'Working assumption — test budget', notes:'Test phase spend Jan–Feb 2027.', review_date:'2027-Q1'
+  },
+  redditPhase1CVR: {
+    label:'Reddit — Phase 1 CVR', category:'assumption', defaultValue:0.010,
+    unit:'%', min:0.001, max:0.05, step:0.001,
+    source:'Working assumption', notes:'Sessions → NCs conversion rate for Phase 1 test.', review_date:'2027-Q1'
+  },
+  redditPhase2Spend: {
+    label:'Reddit — Phase 2 Spend (Mar–May)', category:'assumption', defaultValue:8000,
+    unit:'£', min:0, max:50000, step:500,
+    source:'Working assumption — scale phase', notes:'Scale phase spend Mar–May 2027.', review_date:'2027-Q1'
+  },
+  redditPhase2CVR: {
+    label:'Reddit — Phase 2 CVR', category:'assumption', defaultValue:0.015,
+    unit:'%', min:0.001, max:0.05, step:0.001,
+    source:'Working assumption', notes:'Conversion rate for Phase 2 (expects creative/targeting improvement vs Phase 1).', review_date:'2027-Q1'
+  },
+  redditTotalSpend: {
+    label:'Reddit — Full-Year Total Spend', category:'assumption', defaultValue:25000,
+    unit:'£', min:0, max:150000, step:1000,
+    source:'Working assumption', notes:'Full 2027 Reddit budget. Phase 3 (Jun–Dec) spend = total − Phase 1 − Phase 2.', review_date:'2027-Q1'
+  },
+  redditPhase3CVR: {
+    label:'Reddit — Phase 3 CVR (Jun–Dec)', category:'assumption', defaultValue:0.020,
+    unit:'%', min:0.001, max:0.05, step:0.001,
+    source:'Working assumption', notes:'Conversion rate for Jun–Dec 2027 full-run period.', review_date:'2027-Q1'
+  },
+  redditSessionsPerPound: {
+    label:'Reddit — Sessions per £1 Spend', category:'assumption', defaultValue:5,
+    unit:'sessions/£', min:1, max:20, step:0.5,
+    source:'Working assumption — Reddit CPM proxy', notes:'Estimated sessions per £1 of Reddit ad spend.', review_date:'2027-Q1'
+  },
+
+  // ── SEO — Site-Wide ────────────────────────────────────────────
+  seoLactoferrinClicks: {
+    label:'SEO — Lactoferrin Hub Clicks/yr', category:'assumption', defaultValue:6700,
+    unit:'clicks', min:0, max:15000, step:100,
+    source:'GSC impression volume × 5% CTR estimate', notes:'Annual incremental click potential from new lactoferrin benefits hub page.', review_date:'2027-Q2'
+  },
+  seoLactoferrinCVR: {
+    label:'SEO — Lactoferrin Hub CVR', category:'assumption', defaultValue:0.025,
+    unit:'%', min:0.005, max:0.10, step:0.005,
+    source:'Working assumption — organic CVR proxy', notes:'Clicks-to-purchase conversion rate for lactoferrin hub traffic.', review_date:'2027-Q2'
+  },
+  seoImmuneTitleClicks: {
+    label:'SEO — IMMUNE Title/Meta Fix Clicks/yr', category:'assumption', defaultValue:520,
+    unit:'clicks', min:0, max:2000, step:10,
+    source:'GSC impression volume × CTR improvement estimate', notes:'Incremental annual clicks from IMMUNE title/meta optimisation. High confidence, 4–8 weeks.', review_date:'2027-Q1'
+  },
+  seoRosehipClicks: {
+    label:'SEO — Rosehip Internal Link Clicks/yr', category:'assumption', defaultValue:820,
+    unit:'clicks', min:0, max:2000, step:10,
+    source:'GSC impression volume × CTR estimate', notes:'Incremental annual clicks from rosehip editorial → IMMUNE internal link. High confidence, 2 weeks.', review_date:'2027-Q1'
+  },
+  seoSiteOrgCVR: {
+    label:'SEO — Site Organic CVR', category:'assumption', defaultValue:0.025,
+    unit:'%', min:0.005, max:0.10, step:0.005,
+    source:'Working assumption — not confirmed from GA4', notes:'Site-wide organic CVR applied to IMMUNE title/meta and rosehip link click increments.', review_date:'2027-Q1'
+  },
+
+  // ── SEO — SNOOZE ───────────────────────────────────────────────
+  seoSnoozeImpressions: {
+    label:'SEO — SNOOZE Impressions/Month (locked)', category:'measured', defaultValue:2134,
+    unit:'impressions', min:0, max:10000, step:1,
+    source:'GSC 28-day window to 23 Jun 2026', notes:'Current SNOOZE product page impressions/month. Locked — update from GSC.', review_date:'2027-Q1'
+  },
+  seoSnoozePostCTR: {
+    label:'SEO — SNOOZE Post-Optimisation CTR', category:'assumption', defaultValue:0.045,
+    unit:'%', min:0.01, max:0.15, step:0.005,
+    source:'IMMUNE 8.0% CTR benchmark — title/meta fix expected to lift from 1.5%', notes:'Target CTR after title tag and meta description rewrite. Baseline locked at 1.5%.', review_date:'2027-Q1'
+  },
+  seoSnoozeEditorialImpressions: {
+    label:'SEO — SNOOZE Editorial Impressions/Month', category:'measured', defaultValue:7173,
+    unit:'impressions', min:0, max:20000, step:1,
+    source:'GSC — 5 sleep editorials combined', notes:'Combined impressions/month from 5 sleep-relevant editorials with no SNOOZE product link.', review_date:'2027-Q1'
+  },
+  seoSnoozeEditorialRate: {
+    label:'SEO — SNOOZE Editorial Click-to-Product Rate', category:'assumption', defaultValue:0.002,
+    unit:'%', min:0.001, max:0.02, step:0.001,
+    source:'Working assumption', notes:'% of editorial page impressions that click through to SNOOZE product page via new internal link.', review_date:'2027-Q1'
+  },
+  seoSnoozeLactiumImpressions: {
+    label:'SEO — Lactium Hub New Impressions/Month', category:'assumption', defaultValue:400,
+    unit:'impressions', min:0, max:3000, step:50,
+    source:'Conservative estimate vs 10,304/mo lactoferrin benchmark', notes:'Estimated new monthly impressions from Lactium® benefits hub and FAQ schema.', review_date:'2027-Q2'
+  },
+  seoSnoozeLactiumCTR: {
+    label:'SEO — Lactium Hub CTR', category:'assumption', defaultValue:0.04,
+    unit:'%', min:0.01, max:0.10, step:0.005,
+    source:'Working assumption', notes:'Expected CTR on Lactium hub impressions to SNOOZE product page.', review_date:'2027-Q2'
+  },
+  seoSnoozeOrgCVR: {
+    label:'SEO — SNOOZE Organic CVR', category:'assumption', defaultValue:0.025,
+    unit:'%', min:0.005, max:0.10, step:0.005,
+    source:'Working assumption — not confirmed from GA4', notes:'Organic sessions → new customer conversion rate for SNOOZE.', review_date:'2027-Q1'
+  },
+
+  // ── SEO — FOCUS ────────────────────────────────────────────────
+  seoFocusImpressions: {
+    label:'SEO — FOCUS Impressions/Month (locked)', category:'measured', defaultValue:712,
+    unit:'impressions', min:0, max:5000, step:1,
+    source:'GSC 28-day window to 23 Jun 2026', notes:'Current FOCUS product page impressions/month. Locked — update from GSC.', review_date:'2027-Q1'
+  },
+  seoFocusPostCTR: {
+    label:'SEO — FOCUS Post-Optimisation CTR', category:'assumption', defaultValue:0.035,
+    unit:'%', min:0.01, max:0.10, step:0.005,
+    source:'Working assumption — title/meta rewrite', notes:'Target CTR after title tag and meta description rewrite. Baseline locked at 1.12%.', review_date:'2027-Q1'
+  },
+  seoFocusEditorialImpressions: {
+    label:'SEO — L-Theanine Editorial Impressions/Month (locked)', category:'measured', defaultValue:4202,
+    unit:'impressions', min:0, max:10000, step:1,
+    source:'GSC 28-day window to 23 Jun 2026', notes:'L-theanine editorial impressions/month. Locked — update from GSC. Currently 0 links to /products/focus.', review_date:'2027-Q1'
+  },
+  seoFocusEditorialRate: {
+    label:'SEO — FOCUS Editorial Click-to-Product Rate', category:'assumption', defaultValue:0.02,
+    unit:'%', min:0.005, max:0.05, step:0.005,
+    source:'Working assumption — conservative', notes:'% of L-theanine editorial impressions clicking through to FOCUS product page via new internal link.', review_date:'2027-Q1'
+  },
+  seoFocusOrgCVR: {
+    label:'SEO — FOCUS Organic CVR', category:'assumption', defaultValue:0.025,
+    unit:'%', min:0.005, max:0.10, step:0.005,
+    source:'Working assumption — not confirmed from GA4', notes:'Organic sessions → new customer conversion rate for FOCUS.', review_date:'2027-Q1'
+  }
+};
+
+/* ─── STATE ──────────────────────────────────────────────────── */
+let S = {}; // current state (input values)
+
+function getDefault(key) {
+  return INPUT_META[key].defaultValue;
+}
+
+function initState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      // Merge saved with defaults (new keys get defaults)
+      S = {};
+      for (const key of Object.keys(INPUT_META)) {
+        S[key] = key in parsed ? parsed[key] : getDefault(key);
+      }
+      return;
+    } catch(e) { /* fall through to defaults */ }
+  }
+  S = {};
+  for (const key of Object.keys(INPUT_META)) {
+    S[key] = getDefault(key);
+  }
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+}
+
+function updateInput(key, value) {
+  S[key] = value;
+  saveState();
+  const data = compute();
+  renderAll(data);
+}
+
+/* ─── HELPERS ────────────────────────────────────────────────── */
+function fmt(n, decimals=0) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '£' + Math.round(n).toLocaleString('en-GB');
+}
+function fmtN(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('en-GB');
+}
+function fmtPct(n, dp=1) {
+  if (n === null || n === undefined || isNaN(n)) return 'TBD';
+  return (n * 100).toFixed(dp) + '%';
+}
+function fmtPctRaw(n, dp=1) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return (n * 100).toFixed(dp) + '%';
+}
+
+function flattenSeas(seas, factor) {
+  const n = seas.length, uniform = 1/n;
+  return seas.map(s => s * (1-factor) + uniform * factor);
+}
+
+function rampSeries(start, end, flattenedWeights) {
+  // Returns 12 values interpolated between start and end
+  // using cumulative flattened weights to determine progress t
+  const total = flattenedWeights.reduce((a,b)=>a+b,0);
+  let cum = 0;
+  return flattenedWeights.map((w,i) => {
+    const t = cum / total;
+    const val = start + (end - start) * t;
+    cum += w;
+    return val;
+  });
+}
+
+// Returns revenue per original cohort member for a given elapsed month.
+// M0: full new-customer AOV (acquisition month). M1–M3: linear ramp m1→r3 × repeatOrderAOV.
+// M4–M7: Phase 1 empirical anchors scaled by (r3/0.362). M8+: Phase 2 anchor × 1%/month decay.
+// Replaces one-way-ratchet getSurvival() which used 13.62%/month — empirically wrong.
+function getRevPerMember(elapsed, cohortIdx, m1Series, r60Series) {
+  if (elapsed <= 0) return S.newCustomerAOV; // acquisition month
+  const m1 = m1Series[cohortIdx];
+  const r3 = r60Series[cohortIdx];
+  const r3Scale = r3 / 0.362;
+  if (elapsed === 1) return m1 * S.repeatOrderAOV;
+  if (elapsed <= 3) {
+    const surv = m1 + (r3 - m1) * ((elapsed - 1) / 2);
+    return surv * S.repeatOrderAOV;
+  }
+  if (elapsed <= 7) {
+    const anchor = POST_M3_PHASE1[elapsed] || POST_M3_PHASE1[7];
+    return anchor * r3Scale;
+  }
+  return POST_M3_M8_ANCHOR * r3Scale * Math.pow(1 - POST_M3_PHASE2_DECAY, elapsed - 8);
+}
+
+// Runs the 12-cohort × 12-month IMMUNE matrix for a given NC distribution and retention series.
+// Returns total annual IMMUNE new-cohort revenue. Used for both S3 and S9 scenario comparisons.
+function computeImmuneAnnual(monthlyNC, m1Ser, r60Ser) {
+  let total = 0;
+  for (let c = 0; c < 12; c++) {
+    for (let m = c; m < 12; m++) {
+      total += monthlyNC[c] * getRevPerMember(m - c, c, m1Ser, r60Ser);
+    }
+  }
+  return Math.round(total);
+}
+
+/* ─── COMPUTE ────────────────────────────────────────────────── */
+function compute() {
+  const tbd = {};
+
+  // 1. Flattened seasonality for metric ramps
+  const flatFactor = S.rampFlatteningFactor;
+  const fw = flattenSeas(SEAS, flatFactor);
+
+  // 2. M1 retention series (CRM retention uplift applied to end-state target)
+  const m1Start = S.m1RetentionStart;
+  const m1End = S.m1RetentionEnd; // may be null
+  const effectiveM1End = (m1End !== null && m1End !== undefined) ? m1End * (1 + S.crmRetentionUplift) : null;
+  let m1Series;
+  if (effectiveM1End !== null && effectiveM1End !== undefined) {
+    m1Series = rampSeries(m1Start, effectiveM1End, fw);
+  } else {
+    m1Series = Array(12).fill(m1Start);
+    tbd.m1RetentionEnd = 'M1 Retention 2027 target not set — using flat baseline (no improvement)';
+  }
+
+  // 3. 60-90 day retention series (CRM retention uplift applied to end-state target)
+  const r60Start = S.retention60_90Start;
+  const r60End = S.retention60_90End;
+  let r60Series, effectiveR60End;
+  if (r60Start !== null && r60Start !== undefined) {
+    const r60BaseEnd = (r60End !== null && r60End !== undefined) ? r60End : r60Start;
+    effectiveR60End = r60BaseEnd * (1 + S.crmRetentionUplift);
+    r60Series = rampSeries(r60Start, effectiveR60End, fw);
+    if (r60End === null || r60End === undefined) {
+      tbd.retention60_90End = '60–90 day retention 2027 target not set — using flat baseline';
+    }
+  } else {
+    effectiveR60End = null;
+    r60Series = Array(12).fill(0.25); // placeholder
+    tbd.retention60_90Start = '60–90 day retention baseline not set — using 25% placeholder. Pull from Growth Room.';
+    tbd.retention60_90End = '60–90 day retention target not set';
+  }
+
+  // 4. Other ramped series (CRM sub conv uplift applied to end-state target)
+  const effectiveSubRateEnd = S.subRateAtAcquisitionEnd * (1 + S.crmSubConvUplift);
+  const subRateSeries = rampSeries(S.subRateAtAcquisitionStart, effectiveSubRateEnd, fw);
+  const ordFromSubsSeries = rampSeries(S.ordersFromActiveSubsStart, S.ordersFromActiveSubsEnd, fw);
+
+  // 5. New customer acquisition (CRO uplift: same sessions, higher CVR → more NCs)
+  const BASE_CVR = 0.0317;
+  const effectiveCVR = BASE_CVR * (1 + S.croUplift);
+  const totalNC = S.targetNewCustomers2027;
+  const effectiveTotalNC = Math.round(totalNC * (1 + S.croUplift));
+  const monthlyNC = SEAS.map(w => Math.round(w * effectiveTotalNC));
+  const impliedBudget = totalNC * S.blendedCAC; // unchanged — same sessions regardless of CRO
+  const impliedGrowthPct = S.base2026NewCustomers > 0 ? (effectiveTotalNC / S.base2026NewCustomers - 1) : null;
+
+  // 6. Cohort revenue matrix [cohort][month] — S3 (current retention scenario)
+  const cohortRev = [];
+  for (let c = 0; c < 12; c++) {
+    cohortRev.push([]);
+    for (let m = 0; m < 12; m++) {
+      if (m < c) { cohortRev[c].push(0); continue; }
+      cohortRev[c].push(Math.round(monthlyNC[c] * getRevPerMember(m - c, c, m1Series, r60Series)));
+    }
+  }
+
+  // 7. Monthly IMMUNE totals
+  const immuneMonthly = Array(12).fill(0);
+  for (let m = 0; m < 12; m++) {
+    for (let c = 0; c <= m; c++) immuneMonthly[m] += cohortRev[c][m];
+  }
+
+  // 8. Revenue split OTP / subscription (reporting, using ordFromSubs)
+  const immuneSubMonthly = immuneMonthly.map((r,m) => Math.round(r * ordFromSubsSeries[m]));
+  const immuneOTPMonthly = immuneMonthly.map((r,m) => r - immuneSubMonthly[m]);
+
+  // 9. DAILY
+  const dailyMonthly = computeDAILY();
+
+  // 10. FOCUS (mature live product — own observed run rate, not DAILY-trajectory modelled)
+  const focusMonthly = computeFOCUS();
+
+  // 11. KIDS
+  const kidsMonthly = computeProduct(S.kidsLaunchMonth, S.kidsInitialMonthlyRevenue, S.kidsMonthlyGrowthRate);
+
+  // 12. WEIGHT LOSS
+  const wlMonthly = computeProduct(S.weightLossLaunchMonth, S.weightLossInitialMonthlyRevenue, S.weightLossMonthlyGrowthRate);
+
+  // 13. SNOOZE (distinct from Relo Winback — Relo not modelled here)
+  const snoozeMonthly = computeSNOOZE();
+
+  // 14. Carry-forward (existing active base, decaying from Jan 2027)
+  const carryForwardMonthly = computeCarryForward();
+
+  // 15. Totals
+  const totalMonthly = Array(12).fill(0).map((_,m) =>
+    immuneMonthly[m] + carryForwardMonthly[m] + dailyMonthly[m] + focusMonthly[m] +
+    kidsMonthly[m] + wlMonthly[m] + snoozeMonthly[m]
+  );
+  const totalDTC = totalMonthly.reduce((a,b)=>a+b,0);
+  const varAbs = totalDTC - S.dtcTarget2027;
+  const varPct = S.dtcTarget2027 > 0 ? varAbs / S.dtcTarget2027 : 0;
+
+  // 16b. Derived: implied required new customers to hit target
+  // Non-acquisition subtotal = all streams except 2027 new IMMUNE cohorts
+  // ── SEO incremental NCs ──────────────────────────────────────
+  // Site-wide gaps (annual)
+  const seoLactoferrinNC  = Math.round(S.seoLactoferrinClicks * S.seoLactoferrinCVR);
+  const seoImmuneNC       = Math.round(S.seoImmuneTitleClicks * S.seoSiteOrgCVR);
+  const seoRosehipNC      = Math.round(S.seoRosehipClicks     * S.seoSiteOrgCVR);
+  const seoSiteClicks     = S.seoLactoferrinClicks + S.seoImmuneTitleClicks + S.seoRosehipClicks;
+  const seoSiteNCYear     = seoLactoferrinNC + seoImmuneNC + seoRosehipNC;
+  // SNOOZE (monthly → annual)
+  const seoSnoozeCTRClicks      = Math.max(0, Math.round(S.seoSnoozeImpressions * (S.seoSnoozePostCTR - 0.015)));
+  const seoSnoozeEditClicks     = Math.round(S.seoSnoozeEditorialImpressions * S.seoSnoozeEditorialRate);
+  const seoSnoozeLactiumClicks  = Math.round(S.seoSnoozeLactiumImpressions   * S.seoSnoozeLactiumCTR);
+  const seoSnoozeTotalClicksMo  = seoSnoozeCTRClicks + seoSnoozeEditClicks + seoSnoozeLactiumClicks;
+  const seoSnoozeNCMonth        = Math.round(seoSnoozeTotalClicksMo * S.seoSnoozeOrgCVR);
+  const seoSnoozeNCYear         = seoSnoozeNCMonth * 12;
+  // FOCUS (monthly → annual)
+  const seoFocusCTRClicks       = Math.max(0, Math.round(S.seoFocusImpressions * (S.seoFocusPostCTR - 0.0112)));
+  const seoFocusEditClicks      = Math.round(S.seoFocusEditorialImpressions * S.seoFocusEditorialRate);
+  const seoFocusTotalClicksMo   = seoFocusCTRClicks + seoFocusEditClicks;
+  const seoFocusNCMonth         = Math.round(seoFocusTotalClicksMo * S.seoFocusOrgCVR);
+  const seoFocusNCYear          = seoFocusNCMonth * 12;
+  // Total
+  const seoTotalNCYear = seoSiteNCYear + seoSnoozeNCYear + seoFocusNCYear;
+
+  const nonAcqSubtotal = [carryForwardMonthly, dailyMonthly, focusMonthly, kidsMonthly, wlMonthly, snoozeMonthly]
+    .reduce((sum, arr) => sum + arr.reduce((a,b)=>a+b,0), 0);
+  const nonImmuneTotal = nonAcqSubtotal; // alias used in stream build display
+
+  // Affiliates NC contribution
+  const affiliatesTotalNC = Math.round(
+    S.affiliatesNanoCount  * S.affiliatesNanoNCs  +
+    S.affiliatesMicroCount * S.affiliatesMicroNCs +
+    S.affiliatesHCPCount   * S.affiliatesHCPNCs   +
+    S.affiliatesMediaCount * S.affiliatesMediaNCs
+  );
+  // Distribute affiliates NCs across year by SEAS weights
+  const affiliatesMonthlyNC = SEAS.map(w => Math.round(w * affiliatesTotalNC));
+  const affiliatesCommissionPerOrder = S.affiliatesCommissionRate * S.affiliatesAvgFirstOrder;
+  const affiliatesEffectiveCAC = affiliatesTotalNC > 0
+    ? (affiliatesCommissionPerOrder * affiliatesTotalNC + S.affiliatesPlatformFeeAnnual) / affiliatesTotalNC
+    : affiliatesCommissionPerOrder;
+
+  // Reddit NC contribution (3-phase)
+  const redditPhase3Spend = Math.max(0, S.redditTotalSpend - S.redditPhase1Spend - S.redditPhase2Spend);
+  const redditPhase1NC = Math.round(S.redditPhase1Spend * S.redditSessionsPerPound * S.redditPhase1CVR);
+  const redditPhase2NC = Math.round(S.redditPhase2Spend * S.redditSessionsPerPound * S.redditPhase2CVR);
+  const redditPhase3NC = Math.round(redditPhase3Spend  * S.redditSessionsPerPound * S.redditPhase3CVR);
+  const redditTotalNC  = redditPhase1NC + redditPhase2NC + redditPhase3NC;
+  const redditEffectiveCAC = redditTotalNC > 0 ? S.redditTotalSpend / redditTotalNC : 0;
+  // Monthly distribution: Phase 1 = Jan–Feb, Phase 2 = Mar–May, Phase 3 = Jun–Dec (SEAS-weighted remainder)
+  const p3Seas = SEAS.slice(5); // Jun–Dec weights
+  const p3SeasTotal = p3Seas.reduce((a,b)=>a+b,0);
+  const redditMonthlyNC = SEAS.map((_, m) => {
+    if (m <= 1) return Math.round(redditPhase1NC / 2);
+    if (m <= 4) return Math.round(redditPhase2NC / 3);
+    return p3SeasTotal > 0 ? Math.round(redditPhase3NC * SEAS[m] / p3SeasTotal) : 0;
+  });
+
+  const residualForAcq = S.dtcTarget2027 - nonAcqSubtotal;
+  // Avg year-1 LTV per new customer (S3 retention-adjusted)
+  const immuneTotal = immuneMonthly.reduce((a,b)=>a+b,0);
+  const avgLTVperNC = effectiveTotalNC > 0 ? immuneTotal / effectiveTotalNC : 0;
+  // Required NC — S3 (current scenario)
+  const impliedRequiredNC = avgLTVperNC > 0 ? Math.round(residualForAcq / avgLTVperNC) : null;
+
+  // S9 ceiling scenario (M1→35%, 90d→55%) — hardcoded S9 retention series, same NC distribution
+  const m1SeriesS9 = Array(12).fill(0).map((_,i) => 0.175 + (0.35 - 0.175) * (i / 11));
+  const r60SeriesS9 = Array(12).fill(0).map((_,i) => 0.362 + (0.55 - 0.362) * (i / 11));
+  const immuneTotalS9 = computeImmuneAnnual(monthlyNC, m1SeriesS9, r60SeriesS9);
+  const avgLTVperNCS9 = effectiveTotalNC > 0 ? immuneTotalS9 / effectiveTotalNC : 0;
+  const impliedRequiredNCS9 = avgLTVperNCS9 > 0 ? Math.round(residualForAcq / avgLTVperNCS9) : null;
+
+  // 2026 estimated full-year NC base — live input, update when H2 actuals land
+  const NC_2026_ACTUAL = S.base2026NewCustomers;
+  const nc2026Multiplier_S3 = impliedRequiredNC !== null ? impliedRequiredNC / NC_2026_ACTUAL : null;
+  const nc2026Multiplier_S9 = impliedRequiredNCS9 !== null ? impliedRequiredNCS9 / NC_2026_ACTUAL : null;
+  const impliedMediaSpend_S3 = impliedRequiredNC !== null ? Math.round(impliedRequiredNC * S.blendedCAC) : null;
+  const impliedMediaSpend_S9 = impliedRequiredNCS9 !== null ? Math.round(impliedRequiredNCS9 * S.blendedCAC) : null;
+  // Per-NC LTV reference for 2026 (IMMUNE-only model basis, baseline retention 17.5%/36.2%)
+  const LTV_2026_REF = 129;
+  const ncS3vsS9Delta = (impliedRequiredNC !== null && impliedRequiredNCS9 !== null)
+    ? impliedRequiredNC - impliedRequiredNCS9 : null;
+
+  // 15. Channel attribution (reporting)
+  const channel = {
+    paid: monthlyNC.map(n => Math.round(n * S.paidMediaShare)),
+    seo: monthlyNC.map(n => Math.round(n * S.seoShare)),
+    geo: monthlyNC.map(n => Math.round(n * S.geoShare))
+  };
+
+  // 16. Cumulative
+  const cumulative = [];
+  let cum = 0;
+  for (const v of totalMonthly) { cum += v; cumulative.push(cum); }
+
+  // 17. Persistent structural flags (always shown, regardless of TBD state)
+  const flags = [
+    `CARRY-FORWARD: IMMUNE-only two-phase empirical decay (v7). 26 DB-confirmed cohorts (May 2024–Jun 2026, 10,542 customers) + 6 estimated H2 2026 cohorts (331/month proxy). IMMUNE product IDs {8070861455651, 8068687069475} only — FOCUS/DAILY revenue stripped (was 5.0% of historical revenue; £48,763 removed from carry-forward). Phase 1 (M4–M7): [£11.05, £9.00, £9.37, £8.38]/orig-member. Phase 2 (M8+): £8.15 × 1%/month decay; empirical M8–M20 near-flat. Annual total: £1,080,029. DAILY (£149,586) and FOCUS (£62,513) streams are now genuinely additive — each is a full 2027 trajectory from observed Jun 2026 run rates, with no carry-forward overlap.`,
+    `ACQUISITION MODEL: Current scenario = S3 (M1→${(S.m1RetentionEnd*100).toFixed(0)}%, 90d→${(S.retention60_90End*100).toFixed(0)}%). S9 ceiling = M1 35%, 90d 55%. S3 requires ${impliedRequiredNC !== null ? fmtN(impliedRequiredNC) : '—'} NCs; S9 saves only ${ncS3vsS9Delta !== null ? fmtN(ncS3vsS9Delta) : '~900'} NCs — volume is the primary lever, retention is marginal. Per-NC LTV: S3 £${avgLTVperNC.toFixed(0)}, S9 £${avgLTVperNCS9.toFixed(0)}, 2026 reference £${LTV_2026_REF} (IMMUNE-only, baseline retention). 2027 per-NC lower than 2026 due to SEAS back-weighting: Dec 2027 = 18.7% of NCs (M0 only) vs Dec 2026 ~8.3%. Not a model error — structural feature of seasonal distribution.`,
+    `SNOOZE: Working pool = ${Math.round(S.lapsedOTPBase * S.snoozeReachablePct).toLocaleString()} (${(S.snoozeReachablePct*100).toFixed(0)}% of 7,761 ceiling after estimated Klaviyo suppression). Pool depletes monthly by reactivations, replenishes by estimated new lapsers — capped at working ceiling. Both the reachable fraction and pool mechanic are unvalidated simplifications.`,
+    `SNOOZE: Reactivation rate (${(S.winbackMonthlyReactivationRate*100).toFixed(2)}%/month against working pool) is an unvalidated planning assumption — no ongoing SNOOZE cadence data exists. Review Q2 2027 once 2–3 months of real cadence data exist.`,
+    `FOCUS: Sub-mix uses overall 40.7% — not last-30-day 60.0% which is a composition effect from declining OTP volume, not real subscription growth.`,
+    `STREAM ARCHITECTURE (v7, confirmed clean): Carry-forward = IMMUNE-only (£1,080,029, 96.6% product scope). DAILY/FOCUS/KIDS/WL/SNOOZE are fully additive — no overlap with carry-forward. Non-acquisition subtotal confirmed £${fmtN(nonAcqSubtotal)} (CF £1,080k + product streams £${fmtN(nonAcqSubtotal - 1080029)}). ACQUISITION CHALLENGE: 2026 estimated NCs ~${fmtN(NC_2026_ACTUAL)} (H1 1,984 DB-confirmed + H2 1,986 proxy; H2 plan not yet observed). Required NCs at S3 = ${impliedRequiredNC !== null ? fmtN(impliedRequiredNC) : '—'} = ×${nc2026Multiplier_S3 !== null ? nc2026Multiplier_S3.toFixed(1) : '—'} 2026 estimate. S9 ceiling = ${impliedRequiredNCS9 !== null ? fmtN(impliedRequiredNCS9) : '—'} = ×${nc2026Multiplier_S9 !== null ? nc2026Multiplier_S9.toFixed(1) : '—'}. If H2 2026 underdelivers, 2026 base falls and multiplier rises. Implied media spend (S3): £${impliedMediaSpend_S3 !== null ? fmtN(impliedMediaSpend_S3) : '—'} at £${S.blendedCAC.toFixed(2)} CAC. Residual overlap risk: new 2027 IMMUNE customers also buying FOCUS/DAILY expected <5% (product dominance 96.6%).`
+  ];
+
+  return {
+    tbd, flags,
+    m1Series, r60Series, subRateSeries, ordFromSubsSeries,
+    monthlyNC, totalNC, effectiveTotalNC, impliedBudget, impliedGrowthPct,
+    BASE_CVR, effectiveCVR,
+    effectiveM1End, effectiveR60End, effectiveSubRateEnd,
+    cohortRev,
+    immuneMonthly, immuneSubMonthly, immuneOTPMonthly,
+    carryForwardMonthly,
+    dailyMonthly, focusMonthly, kidsMonthly, wlMonthly, snoozeMonthly,
+    totalMonthly, totalDTC, varAbs, varPct, cumulative, channel,
+    nonAcqSubtotal, nonImmuneTotal, residualForAcq,
+    affiliatesTotalNC, affiliatesMonthlyNC, affiliatesCommissionPerOrder, affiliatesEffectiveCAC,
+    redditTotalNC, redditMonthlyNC, redditEffectiveCAC,
+    redditPhase1NC, redditPhase2NC, redditPhase3NC, redditPhase3Spend,
+    seoTotalNCYear, seoSiteNCYear, seoSiteClicks, seoLactoferrinNC, seoImmuneNC, seoRosehipNC,
+    seoSnoozeCTRClicks, seoSnoozeEditClicks, seoSnoozeLactiumClicks, seoSnoozeTotalClicksMo, seoSnoozeNCMonth, seoSnoozeNCYear,
+    seoFocusCTRClicks, seoFocusEditClicks, seoFocusTotalClicksMo, seoFocusNCMonth, seoFocusNCYear,
+    avgLTVperNC, avgLTVperNCS9, LTV_2026_REF,
+    impliedRequiredNC, impliedRequiredNCS9,
+    NC_2026_ACTUAL, nc2026Multiplier_S3, nc2026Multiplier_S9,
+    impliedMediaSpend_S3, impliedMediaSpend_S9, ncS3vsS9Delta
+  };
+}
+
+function computeCarryForward() {
+  // Returns precomputed full-cohort carry-forward (Jan–Dec 2027).
+  // Source: 26 DB-confirmed cohorts (May 2024–Jun 2026, 10,542 customers) +
+  //         6 estimated H2 2026 cohorts (331/month proxy).
+  // IMMUNE-only two-phase decay (v7): FOCUS/DAILY stripped so those streams add cleanly on top.
+  // Phase 1: [£11.05, £9.00, £9.37, £8.38] M4–M7. Phase 2: £8.15 × 1%/month M8+.
+  // Annual total: £1,080,029.
+  return HIST_CF_MONTHLY.slice();
+}
+
+function computeDAILY() {
+  const baseMonthly = S.dailyRunRatePerDay * 30;
+  const monthlyGrowth = Math.pow(1 + S.dailyAnnualGrowthRate, 1/12) - 1;
+  const jan2027Base = baseMonthly * Math.pow(1 + monthlyGrowth, 8); // 8 months from May 2026
+
+  // Total 2027 DAILY from month-by-month growth
+  let total = 0, cur = jan2027Base;
+  for (let m = 0; m < 12; m++) { total += cur; cur *= (1 + monthlyGrowth); }
+
+  // Redistribute by dampened seasonality
+  const ds = flattenSeas(SEAS, S.dailySeasonalityDampening);
+  const dsTotal = ds.reduce((a,b)=>a+b,0);
+  return ds.map(w => Math.round(total * w / dsTotal));
+}
+
+function computeProduct(launchMonth, initialRev, monthlyGrowth) {
+  const ds = flattenSeas(SEAS, S.dailySeasonalityDampening);
+  const avgDs = ds.reduce((a,b)=>a+b) / 12;
+  return Array.from({length:12}, (_,m) => {
+    if (m < launchMonth) return 0;
+    const elapsed = m - launchMonth;
+    const gf = Math.pow(1 + monthlyGrowth, elapsed);
+    const sf = ds[m] / avgDs;
+    return Math.round(initialRev * gf * sf);
+  });
+}
+
+function computeFOCUS() {
+  // FOCUS launched May 2025. Observation point: Jun 2026 (~13 months trading).
+  // Run rate at observation = focusRunRatePerDay × 30 days.
+  // Months from Jun 2026 to Jan 2027 = 7. Grow forward to get Jan 2027 base.
+  const baseMonthly = S.focusRunRatePerDay * 30;
+  const monthlyGrowth = Math.pow(1 + S.focusAnnualGrowthRate, 1/12) - 1;
+  const jan2027Base = baseMonthly * Math.pow(1 + monthlyGrowth, 7);
+
+  let total = 0, cur = jan2027Base;
+  for (let m = 0; m < 12; m++) { total += cur; cur *= (1 + monthlyGrowth); }
+
+  const ds = flattenSeas(SEAS, S.dailySeasonalityDampening);
+  const dsTotal = ds.reduce((a,b)=>a+b,0);
+  return ds.map(w => Math.round(total * w / dsTotal));
+}
+
+function computeSNOOZE() {
+  // Separate stream from Relo Winback (not modelled here).
+  // Working pool = reachable fraction of lapsed ceiling (Klaviyo suppression estimate).
+  // Pool depletes by reactivations; replenishes by estimated monthly new lapsers (capped at working ceiling).
+  const workingPool = Math.round(S.lapsedOTPBase * S.snoozeReachablePct);
+  const monthlyReplenishment = Math.round(workingPool * S.lapsedGrowthMonthlyRate);
+  let eligible = workingPool;
+  return Array.from({length:12}, (_,m) => {
+    const reactivated = Math.round(eligible * S.winbackMonthlyReactivationRate);
+    const rev = reactivated * S.winbackAOV;
+    eligible = Math.min(workingPool, Math.max(0, eligible - reactivated + monthlyReplenishment));
+    return rev;
+  });
+}
+
+/* ─── CHARTS ─────────────────────────────────────────────────── */
+const charts = {};
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function mkChart(id, cfg) {
+  destroyChart(id);
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  charts[id] = new Chart(canvas.getContext('2d'), cfg);
+}
+
+const chartDefaults = {
+  color: '#64748b',
+  borderColor: '#e2e8f0',
+  font: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', size: 11 }
+};
+
+function chartOpts(extra={}) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#64748b', font: { size: 11 } } },
+      tooltip: { backgroundColor: '#1C3D2A', borderColor: '#0D2518', borderWidth: 1, titleColor: '#fff', bodyColor: '#d1fae5' }
+    },
+    scales: {
+      x: { ticks: { color: '#64748b' }, grid: { color: '#e2e8f0' } },
+      y: { ticks: { color: '#64748b', callback: v => '£'+v.toLocaleString() }, grid: { color: '#e2e8f0' } }
+    },
+    ...extra
+  };
+}
+
+/* ─── RENDER ALL ─────────────────────────────────────────────── */
+function renderAll(data) {
+  renderWarnings(data);
+  if (document.getElementById('tab-dashboard').classList.contains('active')) renderDashboard(data);
+  if (document.getElementById('tab-cohort').classList.contains('active')) renderCohort(data);
+  if (document.getElementById('tab-products').classList.contains('active')) renderProducts(data);
+  if (document.getElementById('tab-winback').classList.contains('active')) renderWinBack(data);
+  if (document.getElementById('tab-affiliates').classList.contains('active')) renderAffiliates(data);
+  if (document.getElementById('tab-reddit').classList.contains('active')) renderReddit(data);
+  if (document.getElementById('tab-seo').classList.contains('active')) renderSEO(data);
+  if (document.getElementById('tab-acquisition').classList.contains('active')) renderAcquisition(data);
+  if (document.getElementById('tab-inputs').classList.contains('active')) renderInputs(data);
+}
+
+function renderTabContent(tab, data) {
+  if (tab === 'dashboard') renderDashboard(data);
+  else if (tab === 'cohort') renderCohort(data);
+  else if (tab === 'products') renderProducts(data);
+  else if (tab === 'winback') renderWinBack(data);
+  else if (tab === 'affiliates') renderAffiliates(data);
+  else if (tab === 'reddit') renderReddit(data);
+  else if (tab === 'seo') renderSEO(data);
+  else if (tab === 'acquisition') renderAcquisition(data);
+  else if (tab === 'inputs') renderInputs(data);
+}
+
+/* ─── WARNINGS ───────────────────────────────────────────────── */
+function renderWarnings(data) {
+  const bar = document.getElementById('warnings-bar');
+  const items = document.getElementById('warn-items');
+  // Always surface the two pending confirmation items. Real TBD placeholders appended if present.
+  const tbdKeys = Object.keys(data.tbd);
+  bar.classList.add('visible');
+  let msg = '<strong>NEEDS INPUT</strong> — 2 inputs need confirming before this model is final: M1 retention 2027 target · 90-day retention 2027 target';
+  if (tbdKeys.length > 0) {
+    msg += ' · ' + tbdKeys.map(k => data.tbd[k].split('—')[0].trim()).join(' · ');
+  }
+  msg += ' → <a href="#" onclick="switchTab(\'inputs\');return false;" style="color:#92400e;font-weight:700;text-decoration:underline">see Model Inputs tab</a>';
+  items.innerHTML = msg;
+}
+
+/* ─── DASHBOARD ──────────────────────────────────────────────── */
+function renderDashboard(data) {
+  const el = document.getElementById('tab-dashboard');
+  const varClass = data.varAbs >= 0 ? 'green' : 'red';
+  const varSign = data.varAbs >= 0 ? '+' : '';
+
+  // Stream totals
+  const immuneTotal = data.immuneMonthly.reduce((a,b)=>a+b,0);
+  const cfTotal = data.carryForwardMonthly.reduce((a,b)=>a+b,0);
+  const dailyTotal = data.dailyMonthly.reduce((a,b)=>a+b,0);
+  const focusTotal = data.focusMonthly.reduce((a,b)=>a+b,0);
+  const kidsTotal = data.kidsMonthly.reduce((a,b)=>a+b,0);
+  const wlTotal = data.wlMonthly.reduce((a,b)=>a+b,0);
+  const snoozeTotal = data.snoozeMonthly.reduce((a,b)=>a+b,0);
+
+  const reqNCClass = (data.impliedRequiredNC !== null && data.impliedRequiredNC > data.totalNC) ? 'red' : 'green';
+  const multS3Str = data.nc2026Multiplier_S3 !== null ? `×${data.nc2026Multiplier_S3.toFixed(1)}` : '—';
+  const multS9Str = data.nc2026Multiplier_S9 !== null ? `×${data.nc2026Multiplier_S9.toFixed(1)}` : '—';
+
+  el.innerHTML = `
+    <div class="card mb-24" style="border-color:var(--amber);background:rgba(245,158,11,.06);padding:20px 24px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:14px">
+        Primary Finding — Acquisition Challenge
+      </div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:0 40px;align-items:start">
+        <div>
+          <div style="font-size:56px;font-weight:800;color:var(--amber);line-height:1">${multS3Str}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4">new customer growth<br>required vs 2026</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 24px">
+          <div>
+            <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Required NCs (S3)</div>
+            <div style="font-size:22px;font-weight:700;color:var(--red)">${data.impliedRequiredNC !== null ? fmtN(data.impliedRequiredNC) : '—'}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Required NCs (S9 ceiling)</div>
+            <div style="font-size:22px;font-weight:700;color:var(--amber)">${data.impliedRequiredNCS9 !== null ? fmtN(data.impliedRequiredNCS9) : '—'}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">2026 actual NCs</div>
+            <div style="font-size:22px;font-weight:700">${fmtN(data.NC_2026_ACTUAL)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Implied media spend (S3)</div>
+            <div style="font-size:22px;font-weight:700">${data.impliedMediaSpend_S3 !== null ? fmt(data.impliedMediaSpend_S3) : '—'}</div>
+          </div>
+          <div style="grid-column:1/-1;padding-top:12px;border-top:1px solid var(--border)">
+            <div style="font-size:12px;color:var(--text);font-weight:400;line-height:1.6;margin-bottom:6px">
+              2026 new customer actuals: <strong>1,901 confirmed Jan–May</strong>. H2 2026 plan requires <strong>2,960 (Jun–Dec)</strong>, implying 423/month vs H1 average of 380/month.
+              The H2 acceleration is consistent with known Q3/Q4 seasonality and has not yet been observed — it is a plan, not a confirmed trajectory.
+              The ${multS3Str} 2027 multiplier is measured against <strong>${fmtN(data.NC_2026_ACTUAL)} estimated full-year 2026 NCs</strong> (H1 actual + H2 plan).
+              If H2 2026 underdelivers, the 2026 base falls and the 2027 multiplier rises accordingly.
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">
+              Retention improvement S3→S9 saves only ${data.ncS3vsS9Delta !== null ? fmtN(data.ncS3vsS9Delta) : '~770'} NCs (${data.ncS3vsS9Delta !== null && data.impliedRequiredNC ? (data.ncS3vsS9Delta/data.impliedRequiredNC*100).toFixed(0) : '~6'}%) —
+              volume is the primary lever.
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">
+              Per-NC LTV: S3 £${data.avgLTVperNC.toFixed(0)} · S9 £${data.avgLTVperNCS9.toFixed(0)} · 2026 ref £${data.LTV_2026_REF}
+              (9% lower in 2027 — Dec SEAS concentration, not model error)
+            </div>
+            <div style="font-size:11px;color:#92400e;padding:8px 12px;background:var(--amber-light);border:1px solid var(--amber-border);border-radius:6px;line-height:1.6">
+              <span style="color:var(--amber);font-weight:600">Open item:</span>
+              This assumes no CRM, CRO, or UX efficiency gains in 2027. The 2026 model reduced new customer dependency through incremental CRM and CRO initiatives. Equivalent 2027 initiatives are not yet scoped — once costed, they reduce the acquisition multiplier directly. The ${multS3Str} figure is the ceiling, not the plan.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-4 mb-24">
+      <div class="card">
+        <div class="card-title">2027 DTC Revenue (Bottom-Up)</div>
+        <div class="card-value">${fmt(data.totalDTC)}</div>
+        <div class="card-sub">Cohorts + carry-forward + product lines + SNOOZE</div>
+      </div>
+      <div class="card">
+        <div class="card-title">vs Top-Down Target</div>
+        <div class="card-value ${varClass}">${varSign}${fmt(data.varAbs)}</div>
+        <div class="card-sub">${varSign}${fmtPctRaw(data.varPct)} vs £${(S.dtcTarget2027/1e6).toFixed(2)}M target</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Non-Acquisition Base</div>
+        <div class="card-value">${fmt(data.nonAcqSubtotal)}</div>
+        <div class="card-sub">CF £${(data.carryForwardMonthly.reduce((a,b)=>a+b,0)/1000).toFixed(0)}k + products £${((data.nonAcqSubtotal - data.carryForwardMonthly.reduce((a,b)=>a+b,0))/1000).toFixed(0)}k · covers ${(data.nonAcqSubtotal/S.dtcTarget2027*100).toFixed(0)}% of target</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Model NC Assumption</div>
+        <div class="card-value">${fmtN(data.totalNC)}</div>
+        <div class="card-sub">${multS3Str} required at S3 · S9 ${multS9Str} · CAC £${S.blendedCAC.toFixed(2)}</div>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title mb-12">Stream Build — Acquisition as Residual</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;font-size:13px">
+        <div style="padding:8px 12px;color:var(--muted)">Stream</div>
+        <div style="padding:8px 12px;text-align:right;color:var(--muted)">Annual £</div>
+        <div style="padding:8px 12px;text-align:right;color:var(--muted)">% of target</div>
+        ${[
+          ['IMMUNE — 2027 new cohorts', immuneTotal],
+          ['Carry-forward (existing active base)', cfTotal],
+          ['DAILY', dailyTotal],
+          ['FOCUS', focusTotal],
+          ['KIDS', kidsTotal],
+          ['WEIGHT LOSS', wlTotal],
+          ['SNOOZE (win-back)', snoozeTotal],
+        ].map(([name, val]) => `
+          <div style="padding:6px 12px;border-top:1px solid var(--border)">${name}</div>
+          <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border)">${fmt(val)}</div>
+          <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--muted)">${(val/S.dtcTarget2027*100).toFixed(1)}%</div>
+        `).join('')}
+        <div style="padding:8px 12px;border-top:2px solid var(--border);font-weight:600">Non-acquisition subtotal (CF + all product streams)</div>
+        <div style="padding:8px 12px;text-align:right;border-top:2px solid var(--border);font-weight:600">${fmt(data.nonAcqSubtotal)}</div>
+        <div style="padding:8px 12px;text-align:right;border-top:2px solid var(--border);color:var(--muted)">${(data.nonAcqSubtotal/S.dtcTarget2027*100).toFixed(1)}%</div>
+        ${data.affiliatesTotalNC > 0 ? `
+        <div style="padding:6px 12px;border-top:1px solid var(--border);color:var(--green)">Affiliates NCs (${fmtN(data.affiliatesTotalNC)} NCs × £${data.avgLTVperNC.toFixed(0)}/NC)</div>
+        <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--green)">${fmt(Math.round(data.affiliatesTotalNC * data.avgLTVperNC))}</div>
+        <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--green)">${(data.affiliatesTotalNC * data.avgLTVperNC / S.dtcTarget2027*100).toFixed(1)}%</div>
+        ` : ''}
+        ${data.redditTotalNC > 0 ? `
+        <div style="padding:6px 12px;border-top:1px solid var(--border);color:var(--green)">Reddit NCs (${fmtN(data.redditTotalNC)} NCs × £${data.avgLTVperNC.toFixed(0)}/NC)</div>
+        <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--green)">${fmt(Math.round(data.redditTotalNC * data.avgLTVperNC))}</div>
+        <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--green)">${(data.redditTotalNC * data.avgLTVperNC / S.dtcTarget2027*100).toFixed(1)}%</div>
+        ` : ''}
+        ${data.seoTotalNCYear > 0 ? `
+        <div style="padding:6px 12px;border-top:1px solid var(--border);color:var(--green)">SEO NCs (${fmtN(data.seoTotalNCYear)} NCs × £${data.avgLTVperNC.toFixed(0)}/NC · organic)</div>
+        <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--green)">${fmt(Math.round(data.seoTotalNCYear * data.avgLTVperNC))}</div>
+        <div style="padding:6px 12px;text-align:right;border-top:1px solid var(--border);color:var(--green)">${(data.seoTotalNCYear * data.avgLTVperNC / S.dtcTarget2027*100).toFixed(1)}%</div>
+        ` : ''}
+        ${(() => {
+          const channelRev = Math.round((data.affiliatesTotalNC + data.redditTotalNC + data.seoTotalNCYear) * data.avgLTVperNC);
+          const paidGap = data.residualForAcq - channelRev;
+          const anyChannel = data.affiliatesTotalNC > 0 || data.redditTotalNC > 0 || data.seoTotalNCYear > 0;
+          const paidLabel = anyChannel ? 'Residual gap (paid acquisition must close)' : 'Residual gap (acquisition must close)';
+          return `
+        <div style="padding:8px 12px;border-top:1px solid var(--border);color:var(--amber)">${paidLabel}</div>
+        <div style="padding:8px 12px;text-align:right;border-top:1px solid var(--border);color:var(--amber)">${fmt(paidGap)}</div>
+        <div style="padding:8px 12px;text-align:right;border-top:1px solid var(--border);color:var(--amber)">${(paidGap/S.dtcTarget2027*100).toFixed(1)}%</div>
+          `;
+        })()}
+        <div style="padding:8px 12px;border-top:2px solid var(--border);font-weight:600">Implied Required NC — S3 (gap ÷ £${data.avgLTVperNC.toFixed(0)}/NC)</div>
+        <div style="padding:8px 12px;text-align:right;border-top:2px solid var(--border);font-weight:600;color:var(--red)">${data.impliedRequiredNC !== null ? fmtN(data.impliedRequiredNC) : '—'}</div>
+        <div style="padding:8px 12px;text-align:right;border-top:2px solid var(--border);color:var(--amber);font-weight:600">${multS3Str} vs 2026</div>
+        <div style="padding:8px 12px;border-top:1px solid var(--border);color:var(--muted)">Implied Required NC — S9 ceiling (gap ÷ £${data.avgLTVperNCS9.toFixed(0)}/NC)</div>
+        <div style="padding:8px 12px;text-align:right;border-top:1px solid var(--border);color:var(--muted)">${data.impliedRequiredNCS9 !== null ? fmtN(data.impliedRequiredNCS9) : '—'}</div>
+        <div style="padding:8px 12px;text-align:right;border-top:1px solid var(--border);color:var(--muted)">${multS9Str} vs 2026</div>
+      </div>
+      <div style="font-size:11px;color:var(--dim);margin-top:8px;padding:0 12px">
+        Non-acquisition subtotal confirmed: £1,080k carry-forward (IMMUNE-only, v7 empirical decay) + £${((data.nonAcqSubtotal - data.carryForwardMonthly.reduce((a,b)=>a+b,0))/1000).toFixed(0)}k product streams (DAILY + FOCUS + KIDS + WL + SNOOZE) — all streams fully additive, zero overlap with carry-forward.
+        2026 actual NC base: 3,970 (H1 1,984 DB-confirmed + H2 1,986 proxy at 331/mo). S9 saves ${data.ncS3vsS9Delta !== null ? fmtN(data.ncS3vsS9Delta) : '~900'} NCs vs S3 — marginal.
+        <strong style="color:var(--amber)">Open item:</strong> Required NC assumes no additional efficiency levers. CRM/CRO initiatives in scope for 2027 will reduce this figure — model to be updated once those are costed.
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px">
+      <div class="card">
+        <div class="card-title" style="font-size:11px">Carry-Forward</div>
+        <div class="card-value" style="font-size:16px">${fmt(cfTotal)}</div>
+        <div class="card-sub" style="font-size:10px">~1,100 active Jan 2027 · full cohort method</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:11px">DAILY</div>
+        <div class="card-value" style="font-size:16px">${fmt(dailyTotal)}</div>
+        <div class="card-sub" style="font-size:10px">${fmtPctRaw(dailyTotal/data.totalDTC)} of DTC</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:11px">FOCUS</div>
+        <div class="card-value" style="font-size:16px">${fmt(focusTotal)}</div>
+        <div class="card-sub" style="font-size:10px">Mature · 13mo trading</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:11px">KIDS</div>
+        <div class="card-value" style="font-size:16px">${fmt(kidsTotal)}</div>
+        <div class="card-sub" style="font-size:10px">Q1 launch · ${MO[S.kidsLaunchMonth]}</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:11px">WEIGHT LOSS</div>
+        <div class="card-value" style="font-size:16px">${fmt(wlTotal)}</div>
+        <div class="card-sub" style="font-size:10px">Q2 launch · ${MO[S.weightLossLaunchMonth]}</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:11px">SNOOZE</div>
+        <div class="card-value" style="font-size:16px">${fmt(snoozeTotal)}</div>
+        <div class="card-sub" style="font-size:10px">Ongoing · base 7,761 ceiling</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap mb-16" style="height:320px">
+      <div class="chart-title">Monthly DTC Revenue by Stream</div>
+      <canvas id="chart-stacked" height="280"></canvas>
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="chart-wrap" style="height:260px">
+        <div class="chart-title">Cumulative Revenue vs Target</div>
+        <canvas id="chart-cumulative" height="220"></canvas>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <div class="chart-title">Revenue Mix by Stream (Annual)</div>
+        <canvas id="chart-mix" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="card mb-16">
+      <div class="card-title" style="margin-bottom:12px">Monthly Revenue Summary</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Month</th>
+              <th>IMMUNE OTP</th>
+              <th>IMMUNE Sub</th>
+              <th>Carry-Fwd</th>
+              <th>DAILY</th>
+              <th>FOCUS</th>
+              <th>KIDS</th>
+              <th>Wt Loss</th>
+              <th>SNOOZE</th>
+              <th style="font-weight:700">Total DTC</th>
+              <th>Cumulative</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${MO.map((mo,m) => `
+              <tr>
+                <td>${mo} 2027</td>
+                <td>${fmt(data.immuneOTPMonthly[m])}</td>
+                <td>${fmt(data.immuneSubMonthly[m])}</td>
+                <td style="color:var(--muted)">${fmt(data.carryForwardMonthly[m])}</td>
+                <td>${fmt(data.dailyMonthly[m])}</td>
+                <td>${fmt(data.focusMonthly[m])}</td>
+                <td>${fmt(data.kidsMonthly[m])}</td>
+                <td>${fmt(data.wlMonthly[m])}</td>
+                <td>${fmt(data.snoozeMonthly[m])}</td>
+                <td style="font-weight:600">${fmt(data.totalMonthly[m])}</td>
+                <td>${fmt(data.cumulative[m])}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr class="tfoot-row">
+              <td>Full Year 2027</td>
+              <td>${fmt(data.immuneOTPMonthly.reduce((a,b)=>a+b,0))}</td>
+              <td>${fmt(data.immuneSubMonthly.reduce((a,b)=>a+b,0))}</td>
+              <td>${fmt(cfTotal)}</td>
+              <td>${fmt(dailyTotal)}</td>
+              <td>${fmt(focusTotal)}</td>
+              <td>${fmt(kidsTotal)}</td>
+              <td>${fmt(wlTotal)}</td>
+              <td>${fmt(snoozeTotal)}</td>
+              <td>${fmt(data.totalDTC)}</td>
+              <td>${fmt(data.totalDTC)}</td>
+            </tr>
+            <tr>
+              <td colspan="8" style="text-align:right;color:var(--muted);font-size:11px">Top-down target</td>
+              <td style="font-weight:600;color:${data.varAbs>=0?'var(--green)':'var(--red)'}">${fmt(S.dtcTarget2027)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Charts
+  mkChart('chart-stacked', {
+    type: 'bar',
+    data: {
+      labels: MO,
+      datasets: [
+        { label:'IMMUNE OTP', data: data.immuneOTPMonthly, backgroundColor:'rgba(59,130,246,.5)', stack:'s' },
+        { label:'IMMUNE Sub', data: data.immuneSubMonthly, backgroundColor:'rgba(59,130,246,.85)', stack:'s' },
+        { label:'Carry-Forward', data: data.carryForwardMonthly, backgroundColor:'rgba(99,102,241,.6)', stack:'s' },
+        { label:'DAILY', data: data.dailyMonthly, backgroundColor:'rgba(16,185,129,.75)', stack:'s' },
+        { label:'FOCUS', data: data.focusMonthly, backgroundColor:'rgba(6,182,212,.75)', stack:'s' },
+        { label:'KIDS', data: data.kidsMonthly, backgroundColor:'rgba(139,92,246,.75)', stack:'s' },
+        { label:'Weight Loss', data: data.wlMonthly, backgroundColor:'rgba(245,158,11,.75)', stack:'s' },
+        { label:'SNOOZE', data: data.snoozeMonthly, backgroundColor:'rgba(239,68,68,.6)', stack:'s' },
+      ]
+    },
+    options: { ...chartOpts(), plugins: { ...chartOpts().plugins, tooltip: { mode:'index' } } }
+  });
+
+  const targetLine = Array(12).fill(S.dtcTarget2027 / 12);
+  let cumTarget = 0;
+  const cumTargetArr = targetLine.map(v => { cumTarget += v; return cumTarget; });
+
+  mkChart('chart-cumulative', {
+    type: 'line',
+    data: {
+      labels: MO,
+      datasets: [
+        { label:'Cumulative DTC', data: data.cumulative, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.1)', fill:true, tension:.3 },
+        { label:'Target Pace', data: cumTargetArr, borderColor:'rgba(239,68,68,.5)', borderDash:[4,4], fill:false, tension:.3 }
+      ]
+    },
+    options: chartOpts()
+  });
+
+  mkChart('chart-mix', {
+    type: 'doughnut',
+    data: {
+      labels: ['IMMUNE OTP','IMMUNE Sub','Carry-Forward','DAILY','FOCUS','KIDS','Weight Loss','SNOOZE'],
+      datasets: [{ data: [
+        data.immuneOTPMonthly.reduce((a,b)=>a+b,0),
+        data.immuneSubMonthly.reduce((a,b)=>a+b,0),
+        cfTotal, dailyTotal, focusTotal, kidsTotal, wlTotal, snoozeTotal
+      ], backgroundColor:['rgba(59,130,246,.5)','rgba(59,130,246,.85)','rgba(99,102,241,.6)','rgba(16,185,129,.75)','rgba(6,182,212,.75)','rgba(139,92,246,.75)','rgba(245,158,11,.75)','rgba(239,68,68,.6)'] }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{color:'#64748b',font:{size:11}} } } }
+  });
+}
+
+/* ─── COHORT ENGINE TAB ──────────────────────────────────────── */
+function renderCohort(data) {
+  const el = document.getElementById('tab-cohort');
+
+  const tbdFlags = Object.keys(data.tbd).length > 0 ? `
+    <div class="tbd-flag mb-16">
+      <strong>TBD inputs active:</strong> ${Object.values(data.tbd).join(' · ')}
+    </div>` : '';
+
+  el.innerHTML = `
+    ${tbdFlags}
+    <div class="note-box mb-16">
+      <strong>How the cohort engine works:</strong> Each month's new customers form a cohort tracked forward through their own retention curve (M1, 60–90 day, then ongoing churn). Retention assumptions snapshot at the cohort's acquisition month — later-year improvements don't retroactively reprice earlier cohorts. The four ramping metrics below interpolate from 2026 baseline to 2027 target using the flattened seasonality shape.
+    </div>
+
+    <div class="section-title mb-16">Four Ramping Metrics</div>
+    <div class="grid-2 mb-24">
+      ${rampSlider('m1Retention', 'M1 Retention (Blended All Customers)', data.m1Series)}
+      ${rampSlider('retention60_90', '60–90 Day Retention (% of Original Cohort at Month 3)', data.r60Series)}
+      ${rampSlider('subRateAtAcquisition', 'Subscription Rate at Acquisition', data.subRateSeries)}
+      ${rampSlider('ordersFromActiveSubs', 'Orders from Active Subscriptions (Revenue Split)', data.ordFromSubsSeries)}
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="card">
+        <div class="card-title">Ramp Flattening Factor</div>
+        <div class="input-row mt-16">
+          <span class="input-label">Factor (0=raw seasonality, 1=linear)</span>
+          <input type="number" class="inp" min="0" max="1" step="0.05" value="${S.rampFlatteningFactor}"
+            onchange="updateInput('rampFlatteningFactor', parseFloat(this.value)||0)">
+        </div>
+        <div class="input-row">
+          <span class="input-label" style="color:var(--dim)">Post-M3 Churn Rate [ref only]</span>
+          <input type="number" class="inp" min="0" max="0.5" step="0.001" value="${(S.ongoingMonthlyChurnRate*100).toFixed(2)}" disabled style="opacity:0.4">
+          <span class="inp-unit" style="color:var(--dim)">% (not used)</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Monthly Metric Values (Jan → Dec 2027)</div>
+        <table style="font-size:11px">
+          <thead><tr><th style="text-align:left">Month</th><th>M1 Ret</th><th>60-90d Ret</th><th>Sub Rate</th><th>% from Subs</th></tr></thead>
+          <tbody>${MO.map((mo,m)=>`<tr>
+            <td>${mo}</td>
+            <td>${fmtPctRaw(data.m1Series[m])}</td>
+            <td>${fmtPctRaw(data.r60Series[m])}</td>
+            <td>${fmtPctRaw(data.subRateSeries[m])}</td>
+            <td>${fmtPctRaw(data.ordFromSubsSeries[m])}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title mb-8">Cohort Revenue Matrix</div>
+    <div class="section-muted">Rows = calendar month · Columns = acquisition cohort · Diagonal = first orders (highlighted) · Lower triangle = retention revenue</div>
+    <div class="cohort-matrix-wrap">
+      <table class="cohort-matrix">
+        <thead>
+          <tr>
+            <th class="col-label">Month</th>
+            ${MO.map((mo,c)=>`<th>Jan coh<br>${mo}</th>`).join('')}
+            <th class="total-col">IMMUNE Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${MO.map((mo,m)=>`
+            <tr>
+              <td style="text-align:left;font-weight:600;color:var(--text)">${mo} 2027</td>
+              ${data.cohortRev.map((cohort,c)=>{
+                if (m < c) return `<td class="zero">—</td>`;
+                const v = cohort[m];
+                const cls = (m===c) ? 'first-order' : (v===0?'zero':'');
+                return `<td class="${cls}">${v===0?'—':fmt(v).replace('£','')}</td>`;
+              }).join('')}
+              <td class="total-col">${fmt(data.immuneMonthly[m])}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td>Cohort Total</td>
+            ${data.cohortRev.map((cohort,c)=>`<td>${fmt(cohort.reduce((a,b)=>a+b,0))}</td>`).join('')}
+            <td class="total-col">${fmt(data.immuneMonthly.reduce((a,b)=>a+b,0))}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+
+  setupRampSliderListeners();
+}
+
+function rampSlider(prefix, label, series) {
+  const startKey = prefix + 'Start';
+  const endKey = prefix + 'End';
+  const startVal = S[startKey];
+  const endVal = S[endKey];
+  const isTBD = endVal === null || endVal === undefined;
+
+  const maxBar = Math.max(...series, 0.001);
+  const bars = series.map(v => {
+    const h = Math.max(4, Math.round((v / maxBar) * 40));
+    return `<div class="ramp-bar" style="height:${h}px"></div>`;
+  }).join('');
+
+  return `
+    <div class="slider-wrap">
+      <div class="slider-header">
+        <span class="slider-label">${label}</span>
+        ${isTBD ? '<span class="badge badge-tbd">End: TBD</span>' : ''}
+      </div>
+      <div class="slider-values">
+        <div class="slider-val-box">
+          <label>2026 Baseline</label>
+          <input type="number" class="ramp-inp" data-key="${startKey}"
+            value="${startVal !== null ? (startVal*100).toFixed(2) : ''}"
+            placeholder="TBD" min="0" max="100" step="0.1"
+            ${startVal === null ? 'class="ramp-inp tbd"' : ''}>
+          <span class="inp-unit" style="font-size:10px;margin-left:2px">%</span>
+        </div>
+        <div class="slider-arrow">→ 2027 →</div>
+        <div class="slider-val-box">
+          <label>2027 Target</label>
+          <input type="number" class="ramp-inp" data-key="${endKey}"
+            value="${endVal !== null && endVal !== undefined ? (endVal*100).toFixed(2) : ''}"
+            placeholder="TBD — set target" min="0" max="100" step="0.1"
+            style="${isTBD ? 'border-color:var(--amber);color:var(--amber)' : ''}">
+          <span class="inp-unit" style="font-size:10px;margin-left:2px">%</span>
+          ${!isTBD ? `<button class="set-tbd-btn" data-key="${endKey}" onclick="clearToTBD('${endKey}')">Set TBD</button>` : ''}
+        </div>
+      </div>
+      <div class="slider-ramp">${bars}</div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:3px">
+        ${MO.map(m=>`<span>${m}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// Single-value uplift slider — mirrors rampSlider() visually using the same CSS classes.
+// baselineDisplay: read-only text shown on the left (e.g. "3.17%").
+// effectiveDisplay: live computed text shown in the header right (e.g. "3.17% → 3.49%").
+// maxPct: integer max for the input (50 for CRO, 20 for CRM).
+function efficiencySlider(key, label, baselineDisplay, effectiveDisplay, maxPct) {
+  const val = S[key] != null ? S[key] : 0;
+  return `
+    <div class="slider-wrap">
+      <div class="slider-header">
+        <span class="slider-label">${label}</span>
+        <span style="font-size:11px;font-weight:600;color:var(--blue)">${effectiveDisplay}</span>
+      </div>
+      <div class="slider-values">
+        <div class="slider-val-box">
+          <label>Baseline</label>
+          <span style="display:block;padding:4px 7px;font-size:13px;color:var(--dim);font-weight:600;width:90px;text-align:center">${baselineDisplay}</span>
+        </div>
+        <div class="slider-arrow">→ uplift →</div>
+        <div class="slider-val-box">
+          <label>Uplift</label>
+          <input type="number" class="ramp-inp" data-key="${key}"
+            value="${(val*100).toFixed(0)}" min="0" max="${maxPct}" step="1">
+          <span class="inp-unit" style="font-size:10px;margin-left:2px">%</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function setupRampSliderListeners() {
+  document.querySelectorAll('.ramp-inp').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const key = inp.dataset.key;
+      const raw = inp.value.trim();
+      if (raw === '' || raw.toLowerCase() === 'tbd') {
+        updateInput(key, null);
+      } else {
+        const v = parseFloat(raw);
+        if (!isNaN(v)) updateInput(key, v / 100);
+      }
+    });
+  });
+  // raw-inp: stores value as-is (no /100), used for counts, £ amounts, integers
+  document.querySelectorAll('.raw-inp').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const key = inp.dataset.key;
+      const v = parseFloat(inp.value.trim());
+      if (!isNaN(v)) updateInput(key, v);
+    });
+  });
+}
+
+function clearToTBD(key) {
+  updateInput(key, null);
+}
+
+/* ─── PRODUCT LINES TAB ──────────────────────────────────────── */
+function renderProducts(data) {
+  const el = document.getElementById('tab-products');
+  const dailyTotal = data.dailyMonthly.reduce((a,b)=>a+b,0);
+  const focusTotal = data.focusMonthly.reduce((a,b)=>a+b,0);
+  const kidsTotal = data.kidsMonthly.reduce((a,b)=>a+b,0);
+  const wlTotal = data.wlMonthly.reduce((a,b)=>a+b,0);
+
+  el.innerHTML = `
+    <div class="note-box mb-16">
+      <strong>Product lines are bolt-on streams</strong> — calculated independently and summed into total DTC revenue. Not folded into the core IMMUNE cohort engine. DAILY and FOCUS use observed run rates; KIDS and WEIGHT LOSS use DAILY-trajectory modelling (pre-launch).
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <span class="product-badge badge-daily">DAILY</span>
+        <span style="font-size:12px;color:var(--muted)">Live since 6 May 2026 · £338/day run rate · 55.8% sub mix</span>
+        <span class="badge badge-measured" style="margin-left:auto">Already Trading</span>
+      </div>
+      <div class="tbd-flag" style="background:var(--amber-light);border-color:var(--amber-border);color:#92400e">
+        Too early for reliable churn signal (44 days, 1–18 orders/day). Run rate is directional only. Review at Q3 2026 when 3+ months of data available.
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="input-row">
+            <span class="input-label">Run Rate (£/day)</span>
+            <input type="number" class="inp" value="${S.dailyRunRatePerDay}" min="0" step="1"
+              onchange="updateInput('dailyRunRatePerDay', parseFloat(this.value)||0)">
+            <span class="inp-unit">£/day</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Annual Growth Rate</span>
+            <input type="number" class="inp" value="${(S.dailyAnnualGrowthRate*100).toFixed(1)}" min="0" max="200" step="1"
+              onchange="updateInput('dailyAnnualGrowthRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Sub Rate at Acquisition</span>
+            <input type="number" class="inp" value="${(S.dailySubRate*100).toFixed(1)}" min="0" max="100" step="0.1"
+              onchange="updateInput('dailySubRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Seasonality Dampening</span>
+            <input type="number" class="inp" value="${S.dailySeasonalityDampening}" min="0" max="1" step="0.05"
+              onchange="updateInput('dailySeasonalityDampening', parseFloat(this.value)||0)">
+            <span class="inp-unit">(0=raw, 1=flat)</span>
+          </div>
+        </div>
+        <div>
+          <div class="card-title mb-8">2027 Monthly DAILY Revenue</div>
+          <table style="font-size:12px">
+            <thead><tr><th style="text-align:left">Month</th><th>Revenue</th></tr></thead>
+            <tbody>${MO.map((mo,m)=>`<tr><td>${mo}</td><td>${fmt(data.dailyMonthly[m])}</td></tr>`).join('')}</tbody>
+            <tfoot><tr class="tfoot-row"><td>Annual Total</td><td>${fmt(dailyTotal)}</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <span class="product-badge badge-focus">FOCUS</span>
+        <span style="font-size:12px;color:var(--muted)">Live since 11 May 2025 · 13 months trading · £150/day run rate · 40.7% sub mix</span>
+        <span class="badge badge-measured" style="margin-left:auto">Mature — Own Run Rate</span>
+      </div>
+      <div class="note-box" style="margin-bottom:12px;font-size:11px">
+        <strong>Not modelled off DAILY's early curve.</strong> FOCUS has 13 months of trading history (604 orders, £60,356 revenue, 1.5 orders/day avg). AOV: £60,356 ÷ 604 = £99.93. Sub-mix uses overall 40.7% — NOT last-30-day 60.0% (composition effect from declining OTP, not real sub growth). Monthly breakdown not yet available to determine trend direction.
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="input-row">
+            <span class="input-label">Run Rate (£/day)</span>
+            <input type="number" class="inp" value="${S.focusRunRatePerDay}" min="0" step="1"
+              onchange="updateInput('focusRunRatePerDay', parseFloat(this.value)||0)">
+            <span class="inp-unit">£/day</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Order AOV</span>
+            <input type="number" class="inp" value="${S.focusAOV.toFixed(2)}" min="0" step="0.01"
+              onchange="updateInput('focusAOV', parseFloat(this.value)||0)">
+            <span class="inp-unit">£ (£60,356 ÷ 604)</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Annual Growth Rate</span>
+            <input type="number" class="inp" value="${(S.focusAnnualGrowthRate*100).toFixed(1)}" min="0" max="200" step="1"
+              onchange="updateInput('focusAnnualGrowthRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Sub Rate (Structural)</span>
+            <input type="number" class="inp" value="${(S.focusSubRate*100).toFixed(1)}" min="0" max="100" step="0.1"
+              onchange="updateInput('focusSubRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">% (overall, not last-30d)</span>
+          </div>
+          <div style="font-size:11px;color:var(--amber);margin-left:168px;margin-top:4px">
+            Last-30-day 60.0% deliberately excluded — see FLAG in warnings bar.
+          </div>
+        </div>
+        <div>
+          <div class="card-title mb-8">2027 Monthly FOCUS Revenue</div>
+          <table style="font-size:12px">
+            <thead><tr><th style="text-align:left">Month</th><th>Revenue</th></tr></thead>
+            <tbody>${MO.map((mo,m)=>`<tr><td>${mo}</td><td>${fmt(data.focusMonthly[m])}</td></tr>`).join('')}</tbody>
+            <tfoot><tr class="tfoot-row"><td>Annual Total</td><td>${fmt(focusTotal)}</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <span class="product-badge badge-kids">KIDS</span>
+        <span style="font-size:12px;color:var(--muted)">Q1 2027 launch · Modelled on DAILY early trajectory</span>
+        <span class="badge badge-assumption" style="margin-left:auto">Pre-Launch Assumption</span>
+      </div>
+      <div class="tbd-flag">
+        <strong>Not yet observed.</strong> Revenue and growth assumptions modelled on DAILY's early curve. Review date: +2 months post-launch.
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="input-row">
+            <span class="input-label">Launch Month</span>
+            <select class="inp" onchange="updateInput('kidsLaunchMonth', parseInt(this.value))">
+              ${MO.map((mo,i)=>`<option value="${i}" ${S.kidsLaunchMonth===i?'selected':''}>${mo} 2027</option>`).join('')}
+            </select>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Initial Monthly Revenue</span>
+            <input type="number" class="inp" value="${S.kidsInitialMonthlyRevenue}" min="0" step="500"
+              onchange="updateInput('kidsInitialMonthlyRevenue', parseFloat(this.value)||0)">
+            <span class="inp-unit">£</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Monthly Growth Rate</span>
+            <input type="number" class="inp" value="${(S.kidsMonthlyGrowthRate*100).toFixed(1)}" min="0" max="100" step="0.5"
+              onchange="updateInput('kidsMonthlyGrowthRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%/month</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Sub Rate at Acquisition</span>
+            <input type="number" class="inp" value="${(S.kidsSubRate*100).toFixed(1)}" min="0" max="100" step="0.1"
+              onchange="updateInput('kidsSubRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%</span>
+          </div>
+        </div>
+        <div>
+          <div class="card-title mb-8">2027 Monthly KIDS Revenue</div>
+          <table style="font-size:12px">
+            <thead><tr><th style="text-align:left">Month</th><th>Revenue</th></tr></thead>
+            <tbody>${MO.map((mo,m)=>`<tr><td>${mo}</td><td>${m<S.kidsLaunchMonth?'<span style="color:var(--dim)">Pre-launch</span>':fmt(data.kidsMonthly[m])}</td></tr>`).join('')}</tbody>
+            <tfoot><tr class="tfoot-row"><td>Annual Total</td><td>${fmt(kidsTotal)}</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <span class="product-badge badge-wl">WEIGHT LOSS</span>
+        <span style="font-size:12px;color:var(--muted)">Early Q2 2027 launch · Modelled on DAILY early trajectory</span>
+        <span class="badge badge-assumption" style="margin-left:auto">Pre-Launch Assumption</span>
+      </div>
+      <div class="tbd-flag">
+        <strong>Not yet observed.</strong> Revenue and growth assumptions modelled on DAILY's early curve. Review date: +2 months post-launch.
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="input-row">
+            <span class="input-label">Launch Month</span>
+            <select class="inp" onchange="updateInput('weightLossLaunchMonth', parseInt(this.value))">
+              ${MO.map((mo,i)=>`<option value="${i}" ${S.weightLossLaunchMonth===i?'selected':''}>${mo} 2027</option>`).join('')}
+            </select>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Initial Monthly Revenue</span>
+            <input type="number" class="inp" value="${S.weightLossInitialMonthlyRevenue}" min="0" step="500"
+              onchange="updateInput('weightLossInitialMonthlyRevenue', parseFloat(this.value)||0)">
+            <span class="inp-unit">£</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Monthly Growth Rate</span>
+            <input type="number" class="inp" value="${(S.weightLossMonthlyGrowthRate*100).toFixed(1)}" min="0" max="100" step="0.5"
+              onchange="updateInput('weightLossMonthlyGrowthRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%/month</span>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Sub Rate at Acquisition</span>
+            <input type="number" class="inp" value="${(S.weightLossSubRate*100).toFixed(1)}" min="0" max="100" step="0.1"
+              onchange="updateInput('weightLossSubRate', parseFloat(this.value)/100||0)">
+            <span class="inp-unit">%</span>
+          </div>
+        </div>
+        <div>
+          <div class="card-title mb-8">2027 Monthly Weight Loss Revenue</div>
+          <table style="font-size:12px">
+            <thead><tr><th style="text-align:left">Month</th><th>Revenue</th></tr></thead>
+            <tbody>${MO.map((mo,m)=>`<tr><td>${mo}</td><td>${m<S.weightLossLaunchMonth?'<span style="color:var(--dim)">Pre-launch</span>':fmt(data.wlMonthly[m])}</td></tr>`).join('')}</tbody>
+            <tfoot><tr class="tfoot-row"><td>Annual Total</td><td>${fmt(wlTotal)}</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ─── SNOOZE TAB ─────────────────────────────────────────────── */
+function renderWinBack(data) {
+  const el = document.getElementById('tab-winback');
+  const snoozeTotal = data.snoozeMonthly.reduce((a,b)=>a+b,0);
+
+  el.innerHTML = `
+    <div class="note-box mb-16">
+      <strong>SNOOZE is a separate reactivation stream</strong> — layered on top of the cohort engine, not folded into monthly cohort math. It is distinct from Relo Winback, which runs independently and is <em>not modelled in this file</em>. SNOOZE is being relaunched as its own ongoing monthly cadence for 2027 — this is forward-looking; no ongoing-cadence data exists yet.
+    </div>
+
+    <div class="tbd-flag mb-16">
+      <strong>Three persistent flags on this stream:</strong> (1) Working pool = ${Math.round(S.lapsedOTPBase * S.snoozeReachablePct).toLocaleString()} customers (${(S.snoozeReachablePct*100).toFixed(0)}% of 7,761 ceiling — Klaviyo suppression unquantified). Pool depletes by reactivations, replenishes by new monthly lapsers, capped at working ceiling. (2) Reactivation rate (${(S.winbackMonthlyReactivationRate*100).toFixed(2)}%/month) is an unvalidated planning assumption — no ongoing cadence data exists. (3) Relo Winback (~330 recipients/message, ~0.50% blended CVR) runs independently and is NOT included here.
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="card">
+        <div class="card-title mb-16">SNOOZE Inputs</div>
+
+        <div class="input-row">
+          <span class="input-label">Eligible Ceiling (measured)</span>
+          <input type="number" class="inp inp-wide" value="${S.lapsedOTPBase}" min="0" step="50"
+            onchange="updateInput('lapsedOTPBase', parseInt(this.value)||0)">
+          <span class="inp-unit">customers</span>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-bottom:12px;margin-left:168px">
+          7,761 customer-level (all products, 91–730 days since last order) from 10,542 unique customers as at 19 Jun 2026. Customer-level rollup — not product-scoped.
+        </div>
+
+        <div class="input-row">
+          <span class="input-label">Reachable Fraction (Klaviyo)</span>
+          <input type="number" class="inp" value="${(S.snoozeReachablePct*100).toFixed(0)}" min="0" max="100" step="5"
+            onchange="updateInput('snoozeReachablePct', parseFloat(this.value)/100||0)">
+          <span class="inp-unit">% → ${Math.round(S.lapsedOTPBase * S.snoozeReachablePct).toLocaleString()} customers</span>
+        </div>
+        <div style="font-size:11px;color:var(--amber);margin-bottom:12px;margin-left:168px">
+          ASSUMPTION. Klaviyo suppression/unsubscribes not yet measured against the lapsed file. 30% (≈ 2,330) is a conservative estimate. This is the working pool the rate is applied to — not the full ceiling. Review when Klaviyo export is run.
+        </div>
+
+        <div class="input-row">
+          <span class="input-label">Monthly Reactivation Rate</span>
+          <input type="number" class="inp" value="${(S.winbackMonthlyReactivationRate*100).toFixed(3)}" min="0" max="5" step="0.05"
+            onchange="updateInput('winbackMonthlyReactivationRate', parseFloat(this.value)/100||0)">
+          <span class="inp-unit">%/month</span>
+        </div>
+        <div style="font-size:11px;color:var(--amber);margin-bottom:12px;margin-left:168px">
+          PLANNING ASSUMPTION — applied to working pool, not ceiling. Refs (not benchmarks): Q4 2026 one-off blast = 0.35% (targeted, 1,144 recipients); Relo = ~0.50% (multi-touch, ~330 recipients). Ongoing cadence to a larger, less-targeted pool should perform below those. 0.15%/month is deliberately conservative. Reactivation rate and pool mechanic both unvalidated — review Q2 2027 once 2–3 months of real cadence data exist.
+        </div>
+
+        <div class="input-row">
+          <span class="input-label">Reactivation AOV</span>
+          <input type="number" class="inp" value="${S.winbackAOV}" min="0" step="0.5"
+            onchange="updateInput('winbackAOV', parseFloat(this.value)||0)">
+          <span class="inp-unit">£</span>
+        </div>
+
+        <div class="input-row">
+          <span class="input-label">Pool Monthly Replenishment</span>
+          <input type="number" class="inp" value="${(S.lapsedGrowthMonthlyRate*100).toFixed(1)}" min="0" max="20" step="0.5"
+            onchange="updateInput('lapsedGrowthMonthlyRate', parseFloat(this.value)/100||0)">
+          <span class="inp-unit">%</span>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-left:168px">
+          % of working pool entering the lapsed window each month (new customers crossing 90-day threshold). Pool is capped at working ceiling — cannot exceed ${Math.round(S.lapsedOTPBase * S.snoozeReachablePct).toLocaleString()}.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">2027 SNOOZE Revenue</div>
+        <div class="card-value">${fmt(snoozeTotal)}</div>
+        <div class="card-sub mb-16">Annual total · planning assumption</div>
+        <table style="font-size:12px">
+          <thead>
+            <tr>
+              <th style="text-align:left">Month</th>
+              <th>Eligible Pool</th>
+              <th>Reactivated</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(()=>{
+              const workingPool = Math.round(S.lapsedOTPBase * S.snoozeReachablePct);
+              const monthlyReplenishment = Math.round(workingPool * S.lapsedGrowthMonthlyRate);
+              let eligible = workingPool;
+              return MO.map((mo,m) => {
+                const reactivated = Math.round(eligible * S.winbackMonthlyReactivationRate);
+                const rev = reactivated * S.winbackAOV;
+                const poolStart = eligible;
+                eligible = Math.min(workingPool, Math.max(0, eligible - reactivated + monthlyReplenishment));
+                return `<tr>
+                  <td>${mo}</td>
+                  <td style="color:var(--muted)">${fmtN(poolStart)}</td>
+                  <td>${fmtN(reactivated)}</td>
+                  <td>${fmt(rev)}</td>
+                </tr>`;
+              }).join('');
+            })()}
+          </tbody>
+          <tfoot>
+            <tr class="tfoot-row">
+              <td>Total</td>
+              <td>—</td>
+              <td>—</td>
+              <td>${fmt(snoozeTotal)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ─── AFFILIATES TAB ─────────────────────────────────────────── */
+function renderAffiliates(data) {
+  const el = document.getElementById('tab-affiliates');
+  const CAC_BASELINE = 48.46;
+  const tiers = [
+    { frag:'Nano',  label:'Nano (<10k)',       count: S.affiliatesNanoCount,  ncs: S.affiliatesNanoNCs  },
+    { frag:'Micro', label:'Micro (10k–100k)',  count: S.affiliatesMicroCount, ncs: S.affiliatesMicroNCs },
+    { frag:'HCP',   label:'HCP',               count: S.affiliatesHCPCount,   ncs: S.affiliatesHCPNCs   },
+    { frag:'Media', label:'Media/Publisher',   count: S.affiliatesMediaCount, ncs: S.affiliatesMediaNCs },
+  ];
+  const totalCreators = tiers.reduce((s,t)=>s+t.count,0);
+  const affiliatesImpliedRev = Math.round(data.affiliatesTotalNC * data.avgLTVperNC);
+  const cacClass = data.affiliatesEffectiveCAC < CAC_BASELINE*0.6 ? 'green'
+    : data.affiliatesEffectiveCAC < CAC_BASELINE ? 'amber' : 'red';
+
+  el.innerHTML = `
+    <div class="card mb-24">
+      <div class="card-title mb-12">Affiliate Programme — 2027 Working Case</div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Total Creators</div>
+          <div class="card-value">${fmtN(totalCreators)}</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Total Affiliates NCs</div>
+          <div class="card-value" style="color:var(--green)">${fmtN(data.affiliatesTotalNC)}</div>
+          <div class="card-sub">${(data.affiliatesTotalNC/Math.max(1,data.impliedRequiredNC)*100).toFixed(1)}% of S3 required NC</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">CAC (commission + fees / NC)</div>
+          <div class="card-value" style="color:var(--${cacClass})">£${data.affiliatesEffectiveCAC.toFixed(2)}</div>
+          <div class="card-sub">${data.affiliatesEffectiveCAC < CAC_BASELINE ? '▼' : '▲'} vs £${CAC_BASELINE.toFixed(2)} paid baseline</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:4px">Commission per order: £${data.affiliatesCommissionPerOrder.toFixed(2)} · Platform fee: £${fmtN(S.affiliatesPlatformFeeAnnual)} spread across ${fmtN(data.affiliatesTotalNC)} NCs</div>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Commission Rate</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <input type="range" class="ramp-inp" data-key="affiliatesCommissionRate"
+              min="8" max="20" step="1" value="${(S.affiliatesCommissionRate*100).toFixed(0)}"
+              style="flex:1" oninput="this.nextElementSibling.textContent=this.value+'%'">
+            <span style="font-weight:700;font-size:15px;min-width:36px">${(S.affiliatesCommissionRate*100).toFixed(0)}%</span>
+          </div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px">Commission per order = rate × AOV = £${data.affiliatesCommissionPerOrder.toFixed(2)}</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Avg First Order Value</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <input type="range" class="raw-inp" data-key="affiliatesAvgFirstOrder"
+              min="15" max="75" step="1" value="${S.affiliatesAvgFirstOrder}"
+              style="flex:1" oninput="this.nextElementSibling.textContent='£'+this.value">
+            <span style="font-weight:700;font-size:15px;min-width:36px">£${S.affiliatesAvgFirstOrder}</span>
+          </div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px">IMMUNE blended AOV proxy</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Platform Fee (annual)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <input type="number" class="raw-inp" data-key="affiliatesPlatformFeeAnnual"
+              value="${S.affiliatesPlatformFeeAnnual}" min="0" max="5000" step="50"
+              style="width:80px;font-size:15px;font-weight:700">
+            <span style="font-size:13px;color:var(--muted)">£/yr</span>
+          </div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px">Spread across all NCs · +£${data.affiliatesTotalNC > 0 ? (S.affiliatesPlatformFeeAnnual/data.affiliatesTotalNC).toFixed(2) : '0.00'}/NC</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title mb-12">Creator Tier Breakdown</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Tier</th>
+              <th>Creator Count</th>
+              <th>NCs/Creator/yr</th>
+              <th>Total NCs</th>
+              <th>% of Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tiers.map(t => {
+              const tierNC = t.count * t.ncs;
+              return `<tr>
+                <td>${t.label}</td>
+                <td style="text-align:right">
+                  <input type="number" class="raw-inp" data-key="affiliates${t.frag}Count"
+                    value="${t.count}" min="0" max="${INPUT_META['affiliates'+t.frag+'Count'].max}" step="${INPUT_META['affiliates'+t.frag+'Count'].step}"
+                    style="width:70px;text-align:right">
+                </td>
+                <td style="text-align:right">
+                  <input type="number" class="raw-inp" data-key="affiliates${t.frag}NCs"
+                    value="${t.ncs}" min="0" max="${INPUT_META['affiliates'+t.frag+'NCs'].max}" step="1"
+                    style="width:60px;text-align:right">
+                </td>
+                <td style="text-align:right;font-weight:600">${fmtN(tierNC)}</td>
+                <td style="text-align:right;color:var(--muted)">${data.affiliatesTotalNC > 0 ? (tierNC/data.affiliatesTotalNC*100).toFixed(0) : '—'}%</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot>
+            <tr class="tfoot-row">
+              <td>Total</td>
+              <td style="text-align:right">${fmtN(totalCreators)}</td>
+              <td></td>
+              <td style="text-align:right;font-weight:700;color:var(--green)">${fmtN(data.affiliatesTotalNC)}</td>
+              <td style="text-align:right">100%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title mb-12">Monthly NC Distribution (SEAS-weighted)</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Month</th>
+              ${MO.map(m=>`<th>${m}</th>`).join('')}
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Affiliates NCs</td>
+              ${data.affiliatesMonthlyNC.map(n=>`<td style="text-align:right">${fmtN(n)}</td>`).join('')}
+              <td style="text-align:right;font-weight:700">${fmtN(data.affiliatesTotalNC)}</td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted)">Implied Revenue</td>
+              ${data.affiliatesMonthlyNC.map(n=>`<td style="text-align:right;color:var(--muted)">${fmt(Math.round(n*data.avgLTVperNC))}</td>`).join('')}
+              <td style="text-align:right;color:var(--green);font-weight:700">${fmt(affiliatesImpliedRev)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--dim);margin-top:8px">
+        Implied revenue = NCs × £${data.avgLTVperNC.toFixed(0)}/NC (S3 LTV proxy).
+        CAC = (commission per order × NCs + platform fee) / NCs = (£${data.affiliatesCommissionPerOrder.toFixed(2)} × ${fmtN(data.affiliatesTotalNC)} + £${fmtN(S.affiliatesPlatformFeeAnnual)}) / ${fmtN(data.affiliatesTotalNC)} = £${data.affiliatesEffectiveCAC.toFixed(2)} vs £${CAC_BASELINE.toFixed(2)} paid baseline.
+        All assumptions unconfirmed — update when programme is contracted.
+      </div>
+    </div>
+  `;
+  setupRampSliderListeners();
+}
+
+/* ─── REDDIT TAB ─────────────────────────────────────────────── */
+function renderReddit(data) {
+  const el = document.getElementById('tab-reddit');
+  const CAC_BASELINE = 48.46;
+  const cacColour = cac => cac <= 0 ? 'muted' : cac < CAC_BASELINE*0.6 ? 'green' : cac < CAC_BASELINE ? 'amber' : 'red';
+  const cacLabel  = cac => cac <= 0 ? '—' : cac < CAC_BASELINE*0.6 ? 'GO' : cac < CAC_BASELINE ? 'CAUTION' : 'ABOVE BASELINE';
+  const p1CAC = data.redditPhase1NC > 0 ? S.redditPhase1Spend / data.redditPhase1NC : 0;
+  const p2CAC = data.redditPhase2NC > 0 ? S.redditPhase2Spend / data.redditPhase2NC : 0;
+  const p3CAC = data.redditPhase3NC > 0 ? data.redditPhase3Spend / data.redditPhase3NC : 0;
+  const redditImpliedRev = Math.round(data.redditTotalNC * data.avgLTVperNC);
+
+  const phases = [
+    { label:'Phase 1 — Test (Jan–Feb)',   spend:S.redditPhase1Spend,   cvr:S.redditPhase1CVR, nc:data.redditPhase1NC, cac:p1CAC, months:'Jan–Feb' },
+    { label:'Phase 2 — Scale (Mar–May)',  spend:S.redditPhase2Spend,   cvr:S.redditPhase2CVR, nc:data.redditPhase2NC, cac:p2CAC, months:'Mar–May' },
+    { label:'Phase 3 — Full run (Jun–Dec)', spend:data.redditPhase3Spend, cvr:S.redditPhase3CVR, nc:data.redditPhase3NC, cac:p3CAC, months:'Jun–Dec' },
+  ];
+
+  el.innerHTML = `
+    <div class="card mb-24">
+      <div class="card-title mb-12">Reddit Paid — 2027 Working Case</div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Total Spend</div>
+          <div class="card-value">${fmt(S.redditTotalSpend)}</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Total Reddit NCs</div>
+          <div class="card-value" style="color:var(--green)">${fmtN(data.redditTotalNC)}</div>
+          <div class="card-sub">${(data.redditTotalNC/Math.max(1,data.impliedRequiredNC)*100).toFixed(1)}% of S3 required NC</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Blended CAC</div>
+          <div class="card-value" style="color:var(--${cacColour(data.redditEffectiveCAC)})">${data.redditEffectiveCAC > 0 ? '£'+data.redditEffectiveCAC.toFixed(2) : '—'}</div>
+          <div class="card-sub">${data.redditEffectiveCAC > 0 && data.redditEffectiveCAC < CAC_BASELINE ? '▼' : '▲'} vs £${CAC_BASELINE.toFixed(2)} paid baseline</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Sessions per £1 Spend</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <input type="range" class="raw-inp" data-key="redditSessionsPerPound"
+              min="1" max="20" step="0.5" value="${S.redditSessionsPerPound}"
+              style="flex:1" oninput="this.nextElementSibling.textContent=this.value">
+            <span style="font-weight:700;font-size:15px;min-width:36px">${S.redditSessionsPerPound}</span>
+          </div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px">Reddit CPM proxy · total sessions = ${fmtN(Math.round(S.redditTotalSpend * S.redditSessionsPerPound))}</div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:11px">Full-Year Budget</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <input type="number" class="raw-inp" data-key="redditTotalSpend"
+              value="${S.redditTotalSpend}" min="0" max="150000" step="1000"
+              style="width:100px;font-size:15px;font-weight:700">
+            <span style="font-size:13px;color:var(--muted)">£ total</span>
+          </div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px">Phase 3 = £${fmtN(data.redditPhase3Spend)} (total − P1 − P2)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title mb-12">Phase Breakdown</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Phase</th>
+              <th>Spend</th>
+              <th>CVR</th>
+              <th>Sessions</th>
+              <th>NCs</th>
+              <th>CAC</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${phases.map((p,i) => {
+              const spendKeys = ['redditPhase1Spend','redditPhase2Spend','redditTotalSpend'];
+              const cvrKeys   = ['redditPhase1CVR','redditPhase2CVR','redditPhase3CVR'];
+              const sessions  = Math.round(p.spend * S.redditSessionsPerPound);
+              const col = cacColour(p.cac);
+              const gate = cacLabel(p.cac);
+              const isP3 = i === 2;
+              return `<tr>
+                <td>${p.label}</td>
+                <td style="text-align:right">${isP3
+                  ? `<span style="color:var(--muted)">${fmt(p.spend)}</span><br><span style="font-size:10px;color:var(--dim)">derived</span>`
+                  : `<input type="number" class="raw-inp" data-key="${spendKeys[i]}" value="${p.spend}" min="0" max="${i===0?20000:50000}" step="500" style="width:80px;text-align:right">`}</td>
+                <td style="text-align:right">
+                  <input type="number" class="ramp-inp" data-key="${cvrKeys[i]}"
+                    value="${(p.cvr*100).toFixed(1)}" min="0.1" max="5" step="0.1"
+                    style="width:60px;text-align:right">%
+                </td>
+                <td style="text-align:right;color:var(--muted)">${fmtN(sessions)}</td>
+                <td style="text-align:right;font-weight:600">${fmtN(p.nc)}</td>
+                <td style="text-align:right;color:var(--${col});font-weight:600">${p.cac > 0 ? '£'+p.cac.toFixed(2) : '—'}</td>
+                <td style="text-align:center">
+                  <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--${col});color:#fff;opacity:0.85">${gate}</span>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot>
+            <tr class="tfoot-row">
+              <td>Full Year</td>
+              <td style="text-align:right">${fmt(S.redditTotalSpend)}</td>
+              <td></td>
+              <td style="text-align:right;color:var(--muted)">${fmtN(Math.round(S.redditTotalSpend * S.redditSessionsPerPound))}</td>
+              <td style="text-align:right;font-weight:700;color:var(--green)">${fmtN(data.redditTotalNC)}</td>
+              <td style="text-align:right;font-weight:700;color:var(--${cacColour(data.redditEffectiveCAC)})">${data.redditEffectiveCAC > 0 ? '£'+data.redditEffectiveCAC.toFixed(2) : '—'}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title mb-12">Monthly NC Distribution</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Month</th>
+              ${MO.map(m=>`<th>${m}</th>`).join('')}
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Reddit NCs</td>
+              ${data.redditMonthlyNC.map(n=>`<td style="text-align:right">${fmtN(n)}</td>`).join('')}
+              <td style="text-align:right;font-weight:700">${fmtN(data.redditTotalNC)}</td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted)">Implied Revenue</td>
+              ${data.redditMonthlyNC.map(n=>`<td style="text-align:right;color:var(--muted)">${fmt(Math.round(n*data.avgLTVperNC))}</td>`).join('')}
+              <td style="text-align:right;color:var(--green);font-weight:700">${fmt(redditImpliedRev)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--dim);margin-top:8px">
+        Phase 1 (Jan–Feb) = test. Phase 2 (Mar–May) = scale if P1 CAC ≤ £${CAC_BASELINE.toFixed(2)}. Phase 3 (Jun–Dec) = full run if P2 confirmed.
+        Implied revenue = NCs × £${data.avgLTVperNC.toFixed(0)}/NC (S3 LTV proxy). All assumptions unconfirmed.
+      </div>
+    </div>
+  `;
+  setupRampSliderListeners();
+}
+
+/* ─── SEO TAB ────────────────────────────────────────────────── */
+function renderSEO(data) {
+  const el = document.getElementById('tab-seo');
+
+  const hdr = (title) =>
+    `<div style="background:var(--header);color:#fff;padding:10px 16px;border-radius:8px 8px 0 0;font-size:13px;font-weight:600;letter-spacing:.03em">${title}</div>`;
+
+  const inpRow = (label, inputHtml, note='') =>
+    `<div class="input-row" style="margin-bottom:10px">
+      <span class="input-label" style="min-width:220px">${label}</span>
+      ${inputHtml}
+      ${note ? `<span style="font-size:11px;color:var(--dim);margin-left:8px">${note}</span>` : ''}
+    </div>`;
+
+  const pctInp = (key, min, max, step) =>
+    `<input type="number" class="ramp-inp inp" data-key="${key}"
+      value="${(S[key]*100).toFixed(S[key] < 0.01 ? 2 : 1)}"
+      min="${(min*100).toFixed(2)}" max="${(max*100).toFixed(0)}" step="${(step*100).toFixed(3)}">
+    <span class="inp-unit">%</span>`;
+
+  const rawInp = (key, min, max, step) =>
+    `<input type="number" class="raw-inp inp" data-key="${key}"
+      value="${S[key]}" min="${min}" max="${max}" step="${step}">`;
+
+  const lockedVal = (val, unit='') =>
+    `<span style="display:inline-block;padding:5px 9px;background:#f1f5f9;border:1px solid var(--border);border-radius:5px;font-size:13px;color:var(--muted);font-weight:600;min-width:80px;text-align:center">${val.toLocaleString()}${unit ? ' '+unit : ''}</span>`;
+
+  // ── Section 1: Site-Wide Gaps ────────────────────────────────
+  const siteRows = [
+    ['Lactoferrin hub',  data.seoLactoferrinNC,  S.seoLactoferrinClicks,  (S.seoLactoferrinCVR*100).toFixed(1)+'%'],
+    ['IMMUNE title/meta fix', data.seoImmuneNC,  S.seoImmuneTitleClicks,  (S.seoSiteOrgCVR*100).toFixed(1)+'%'],
+    ['Rosehip → IMMUNE link', data.seoRosehipNC, S.seoRosehipClicks,      (S.seoSiteOrgCVR*100).toFixed(1)+'%'],
+  ];
+
+  // ── Section 2: SNOOZE rows ───────────────────────────────────
+  const snoozeRows = [
+    ['Title/meta CTR uplift (1.5% → '+( S.seoSnoozePostCTR*100).toFixed(1)+'%)', data.seoSnoozeCTRClicks,     Math.round(data.seoSnoozeCTRClicks    * S.seoSnoozeOrgCVR * 12)],
+    ['Editorial links ('+fmtN(S.seoSnoozeEditorialImpressions)+' imp × '+(S.seoSnoozeEditorialRate*100).toFixed(2)+'%)', data.seoSnoozeEditClicks, Math.round(data.seoSnoozeEditClicks * S.seoSnoozeOrgCVR * 12)],
+    ['Lactium hub ('+S.seoSnoozeLactiumImpressions+' imp × '+(S.seoSnoozeLactiumCTR*100).toFixed(0)+'% CTR)',  data.seoSnoozeLactiumClicks, Math.round(data.seoSnoozeLactiumClicks * S.seoSnoozeOrgCVR * 12)],
+  ];
+
+  // ── Section 3: FOCUS rows ────────────────────────────────────
+  const focusRows = [
+    ['Title/meta CTR uplift (1.12% → '+(S.seoFocusPostCTR*100).toFixed(1)+'%)', data.seoFocusCTRClicks,  Math.round(data.seoFocusCTRClicks  * S.seoFocusOrgCVR * 12)],
+    ['L-theanine editorial link ('+fmtN(S.seoFocusEditorialImpressions)+' imp × '+(S.seoFocusEditorialRate*100).toFixed(0)+'%)', data.seoFocusEditClicks, Math.round(data.seoFocusEditClicks * S.seoFocusOrgCVR * 12)],
+  ];
+
+  el.innerHTML = `
+    <div style="margin-bottom:6px">
+      <h2 style="font-size:18px;font-weight:700;color:var(--text);margin:0 0 4px">Organic Search — SEO Uplift Model</h2>
+      <p style="font-size:12px;color:var(--muted);margin:0">Incremental NCs from SEO optimisations. Net of baseline. Does not include existing organic baseline (~15,320 clicks/yr).</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px">
+      <div class="card" style="border-top:3px solid var(--header)">
+        <div class="card-title">Site-Wide Incremental NCs/yr</div>
+        <div class="card-value" style="color:var(--green)">${fmtN(data.seoSiteNCYear)}</div>
+        <div class="card-sub">${fmtN(data.seoSiteClicks)} incremental clicks · ${(S.seoSiteOrgCVR*100).toFixed(1)}% CVR</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--header)">
+        <div class="card-title">SNOOZE Incremental NCs/yr</div>
+        <div class="card-value" style="color:var(--green)">${fmtN(data.seoSnoozeNCYear)}</div>
+        <div class="card-sub">${fmtN(data.seoSnoozeTotalClicksMo)} clicks/mo · ${fmtN(data.seoSnoozeNCMonth)} NCs/mo</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--header)">
+        <div class="card-title">FOCUS Incremental NCs/yr</div>
+        <div class="card-value" style="color:var(--green)">${fmtN(data.seoFocusNCYear)}</div>
+        <div class="card-sub">${fmtN(data.seoFocusTotalClicksMo)} clicks/mo · ${fmtN(data.seoFocusNCMonth)} NCs/mo</div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: Site-Wide -->
+    <div class="mb-24">
+      ${hdr('1 — Site-Wide Organic Gaps')}
+      <div class="card" style="border-radius:0 0 10px 10px;border-top:none">
+        <div class="grid-2" style="margin-bottom:16px">
+          <div>
+            ${inpRow('Lactoferrin hub clicks/yr', rawInp('seoLactoferrinClicks',0,15000,100))}
+            ${inpRow('Lactoferrin hub CVR', pctInp('seoLactoferrinCVR',0.005,0.10,0.005))}
+            ${inpRow('IMMUNE title/meta fix clicks/yr', rawInp('seoImmuneTitleClicks',0,2000,10), 'High confidence · 4–8 wks')}
+            ${inpRow('Rosehip → IMMUNE link clicks/yr', rawInp('seoRosehipClicks',0,2000,10), 'High confidence · 2 wks')}
+            ${inpRow('Site organic CVR', pctInp('seoSiteOrgCVR',0.005,0.10,0.005), 'Applied to IMMUNE + Rosehip clicks')}
+          </div>
+          <div>
+            <div class="card" style="background:var(--green-light);border-color:var(--green)">
+              <div class="card-title" style="color:var(--green)">Site-Wide Summary</div>
+              <div style="font-size:13px;margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(45,106,79,.15)">
+                  <span style="color:var(--muted)">Incremental clicks/yr</span>
+                  <strong>${fmtN(data.seoSiteClicks)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(45,106,79,.15)">
+                  <span style="color:var(--muted)">Incremental NCs/yr</span>
+                  <strong style="color:var(--green)">${fmtN(data.seoSiteNCYear)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0">
+                  <span style="color:var(--muted)">Assumed CVR</span>
+                  <strong>${(S.seoSiteOrgCVR*100).toFixed(1)}%</strong>
+                </div>
+              </div>
+              <div style="font-size:10px;color:var(--dim)">Conservative modelled range: 150–250 NCs/yr</div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="text-align:left">Gap</th><th>Clicks/yr</th><th>CVR</th><th>NCs/yr</th></tr></thead>
+            <tbody>
+              ${siteRows.map(([name, nc, clicks, cvr]) => `<tr>
+                <td>${name}</td>
+                <td>${fmtN(clicks)}</td>
+                <td style="color:var(--muted)">${cvr}</td>
+                <td style="font-weight:600;color:var(--green)">${fmtN(nc)}</td>
+              </tr>`).join('')}
+            </tbody>
+            <tfoot><tr class="tfoot-row">
+              <td>Total</td><td>${fmtN(data.seoSiteClicks)}</td><td></td>
+              <td style="color:#fff;font-weight:700">${fmtN(data.seoSiteNCYear)}</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: SNOOZE -->
+    <div class="mb-24">
+      ${hdr('2 — SNOOZE Product-Level SEO')}
+      <div class="card" style="border-radius:0 0 10px 10px;border-top:none">
+        <div style="font-size:11px;color:var(--dim);margin-bottom:12px">Baseline: ${fmtN(S.seoSnoozeImpressions)} impressions/mo · 32 clicks · 1.5% CTR · position 7.6</div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div>
+            ${inpRow('Current impressions/mo', lockedVal(S.seoSnoozeImpressions), 'Locked — GSC')}
+            ${inpRow('Post-optimisation CTR', pctInp('seoSnoozePostCTR',0.01,0.15,0.005), 'Baseline locked at 1.5%')}
+            ${inpRow('Editorial impressions/mo', rawInp('seoSnoozeEditorialImpressions',0,20000,1))}
+            ${inpRow('Editorial click-to-product rate', pctInp('seoSnoozeEditorialRate',0.001,0.02,0.001), '% of imp → product click')}
+            ${inpRow('Lactium hub new impressions/mo', rawInp('seoSnoozeLactiumImpressions',0,3000,50))}
+            ${inpRow('Lactium hub CTR', pctInp('seoSnoozeLactiumCTR',0.01,0.10,0.005))}
+            ${inpRow('SNOOZE organic CVR', pctInp('seoSnoozeOrgCVR',0.005,0.10,0.005))}
+          </div>
+          <div>
+            <div class="card" style="background:var(--green-light);border-color:var(--green)">
+              <div class="card-title" style="color:var(--green)">SNOOZE SEO Summary</div>
+              <div style="font-size:13px;margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(45,106,79,.15)">
+                  <span style="color:var(--muted)">Total incremental clicks/mo</span>
+                  <strong>${fmtN(data.seoSnoozeTotalClicksMo)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(45,106,79,.15)">
+                  <span style="color:var(--muted)">Incremental NCs/mo</span>
+                  <strong>${fmtN(data.seoSnoozeNCMonth)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0">
+                  <span style="color:var(--muted)">Incremental NCs/yr</span>
+                  <strong style="color:var(--green)">${fmtN(data.seoSnoozeNCYear)}</strong>
+                </div>
+              </div>
+              <div style="font-size:10px;color:var(--dim)">Conservative modelled range: 20–50 NCs/yr</div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="text-align:left">Source</th><th>Incremental Clicks/Mo</th><th>NCs/yr</th></tr></thead>
+            <tbody>
+              ${snoozeRows.map(([name, clicks, ncs]) => `<tr>
+                <td>${name}</td>
+                <td>${fmtN(clicks)}</td>
+                <td style="font-weight:600;color:var(--green)">${fmtN(ncs)}</td>
+              </tr>`).join('')}
+            </tbody>
+            <tfoot><tr class="tfoot-row">
+              <td>Total</td><td>${fmtN(data.seoSnoozeTotalClicksMo)}</td>
+              <td style="color:#fff;font-weight:700">${fmtN(data.seoSnoozeNCYear)}</td>
+            </tr></tfoot>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-top:8px">
+          Post-optimisation traffic: ~${fmtN(Math.round(S.seoSnoozeImpressions * S.seoSnoozePostCTR) + data.seoSnoozeEditClicks + data.seoSnoozeLactiumClicks + 32)} clicks/mo (up from 32).
+          CTR case: IMMUNE achieves 8.0% at comparable position — SNOOZE gap is a title/meta failure, not a ranking failure.
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: FOCUS -->
+    <div class="mb-24">
+      ${hdr('3 — FOCUS Product-Level SEO')}
+      <div class="card" style="border-radius:0 0 10px 10px;border-top:none">
+        <div style="font-size:11px;color:var(--dim);margin-bottom:12px">Baseline: ${fmtN(S.seoFocusImpressions)} impressions/mo · 8 clicks · 1.12% CTR · position 7.3</div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div>
+            ${inpRow('Current impressions/mo', lockedVal(S.seoFocusImpressions), 'Locked — GSC')}
+            ${inpRow('Post-optimisation CTR', pctInp('seoFocusPostCTR',0.01,0.10,0.005), 'Baseline locked at 1.12%')}
+            ${inpRow('L-theanine editorial impressions/mo', lockedVal(S.seoFocusEditorialImpressions), 'Locked — GSC')}
+            ${inpRow('Editorial click-to-product rate', pctInp('seoFocusEditorialRate',0.005,0.05,0.005), '% of imp → product click')}
+            ${inpRow('FOCUS organic CVR', pctInp('seoFocusOrgCVR',0.005,0.10,0.005))}
+          </div>
+          <div>
+            <div class="card" style="background:var(--green-light);border-color:var(--green)">
+              <div class="card-title" style="color:var(--green)">FOCUS SEO Summary</div>
+              <div style="font-size:13px;margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(45,106,79,.15)">
+                  <span style="color:var(--muted)">Total incremental clicks/mo</span>
+                  <strong>${fmtN(data.seoFocusTotalClicksMo)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(45,106,79,.15)">
+                  <span style="color:var(--muted)">Incremental NCs/mo</span>
+                  <strong>${fmtN(data.seoFocusNCMonth)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0">
+                  <span style="color:var(--muted)">Incremental NCs/yr</span>
+                  <strong style="color:var(--green)">${fmtN(data.seoFocusNCYear)}</strong>
+                </div>
+              </div>
+              <div style="font-size:10px;color:var(--dim)">Conservative modelled range: 20–45 NCs/yr</div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="text-align:left">Source</th><th>Incremental Clicks/Mo</th><th>NCs/yr</th></tr></thead>
+            <tbody>
+              ${focusRows.map(([name, clicks, ncs]) => `<tr>
+                <td>${name}</td>
+                <td>${fmtN(clicks)}</td>
+                <td style="font-weight:600;color:var(--green)">${fmtN(ncs)}</td>
+              </tr>`).join('')}
+            </tbody>
+            <tfoot><tr class="tfoot-row">
+              <td>Total</td><td>${fmtN(data.seoFocusTotalClicksMo)}</td>
+              <td style="color:#fff;font-weight:700">${fmtN(data.seoFocusNCYear)}</td>
+            </tr></tfoot>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-top:8px">
+          Post-optimisation: ~${fmtN(data.seoFocusTotalClicksMo + 8)} clicks/mo (up from 8). L-theanine editorial link is the single highest-leverage action — one hour of work against ${fmtN(S.seoFocusEditorialImpressions)} impressions/mo currently sending nothing to /products/focus.
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: SEO Summary -->
+    <div class="mb-24">
+      ${hdr('4 — SEO Total Contribution')}
+      <div class="card" style="border-radius:0 0 10px 10px;border-top:none">
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="card" style="background:var(--green-light);border-color:var(--green)">
+            <div class="card-title" style="color:var(--green)">Total SEO NCs/yr</div>
+            <div class="card-value" style="color:var(--green)">${fmtN(data.seoTotalNCYear)}</div>
+            <div class="card-sub">${(data.seoTotalNCYear/Math.max(1,data.impliedRequiredNC)*100).toFixed(1)}% of S3 required NC</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Implied Revenue</div>
+            <div class="card-value">${fmt(Math.round(data.seoTotalNCYear * data.avgLTVperNC))}</div>
+            <div class="card-sub">${fmtN(data.seoTotalNCYear)} NCs × £${data.avgLTVperNC.toFixed(0)}/NC (S3 LTV)</div>
+          </div>
+          <div class="card">
+            <div class="card-title">CAC</div>
+            <div class="card-value" style="font-size:16px;color:var(--green)">Organic</div>
+            <div class="card-sub">No media spend · commission-free</div>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-bottom:12px">
+          <table>
+            <thead><tr><th style="text-align:left">Stream</th><th>NCs/yr</th><th>Implied Revenue</th><th>% of SEO total</th></tr></thead>
+            <tbody>
+              <tr><td>Site-wide organic gaps</td><td style="font-weight:600">${fmtN(data.seoSiteNCYear)}</td><td>${fmt(Math.round(data.seoSiteNCYear*data.avgLTVperNC))}</td><td style="color:var(--muted)">${data.seoTotalNCYear>0?(data.seoSiteNCYear/data.seoTotalNCYear*100).toFixed(0):'—'}%</td></tr>
+              <tr><td>SNOOZE optimisation</td><td style="font-weight:600">${fmtN(data.seoSnoozeNCYear)}</td><td>${fmt(Math.round(data.seoSnoozeNCYear*data.avgLTVperNC))}</td><td style="color:var(--muted)">${data.seoTotalNCYear>0?(data.seoSnoozeNCYear/data.seoTotalNCYear*100).toFixed(0):'—'}%</td></tr>
+              <tr><td>FOCUS optimisation</td><td style="font-weight:600">${fmtN(data.seoFocusNCYear)}</td><td>${fmt(Math.round(data.seoFocusNCYear*data.avgLTVperNC))}</td><td style="color:var(--muted)">${data.seoTotalNCYear>0?(data.seoFocusNCYear/data.seoTotalNCYear*100).toFixed(0):'—'}%</td></tr>
+            </tbody>
+            <tfoot><tr class="tfoot-row"><td>Total</td><td>${fmtN(data.seoTotalNCYear)}</td><td>${fmt(Math.round(data.seoTotalNCYear*data.avgLTVperNC))}</td><td style="color:#fff">100%</td></tr></tfoot>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.6">
+          <strong style="color:var(--text)">Timing:</strong> Quick wins (internal links, title/meta) from Q1 2027. Content investments (Lactium hub, lactoferrin hub) from Q2–Q3 2027 subject to publication and indexation lag.<br>
+          <strong style="color:var(--text)">CVR assumption:</strong> 2.5% organic CVR has not been confirmed from GA4 attribution — update once organic channel CVR is isolatable.<br>
+          <strong style="color:var(--text)">Modelled ranges:</strong> Site-wide 150–250 NCs · SNOOZE 20–50 NCs · FOCUS 20–45 NCs (conservative to optimistic).
+        </div>
+      </div>
+    </div>
+  `;
+  setupRampSliderListeners();
+}
+
+/* ─── ACQUISITION TAB ────────────────────────────────────────── */
+function renderAcquisition(data) {
+  const el = document.getElementById('tab-acquisition');
+  const chanTotal = MO.map((_,m) => data.channel.paid[m] + data.channel.seo[m] + data.channel.geo[m]);
+  const chanSum = data.totalNC;
+  const paidSum = data.channel.paid.reduce((a,b)=>a+b,0);
+  const seoSum = data.channel.seo.reduce((a,b)=>a+b,0);
+  const geoSum = data.channel.geo.reduce((a,b)=>a+b,0);
+
+  el.innerHTML = `
+    <div class="note-box mb-16">
+      <strong>Channel split is a reporting layer only</strong> — it breaks the monthly new customer total into Paid Media / SEO / GEO lines for attribution tracking, but does NOT feed back into CAC or volume math. Blended totals drive all model calculations.
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="card">
+        <div class="card-title mb-16">Acquisition Inputs</div>
+        <div class="input-row">
+          <span class="input-label">2027 Target New Customers</span>
+          <input type="number" class="inp inp-wide" value="${S.targetNewCustomers2027}" min="0" step="100"
+            onchange="updateInput('targetNewCustomers2027', parseInt(this.value)||0)">
+        </div>
+        <div class="input-row">
+          <span class="input-label">2026 Estimated New Customers</span>
+          <input type="number" class="inp inp-wide" value="${S.base2026NewCustomers}" min="0" step="100"
+            onchange="updateInput('base2026NewCustomers', parseInt(this.value)||0)">
+          <span class="inp-unit">(base for growth % calc)</span>
+        </div>
+        <div class="input-row">
+          <span class="input-label">Blended CAC</span>
+          <input type="number" class="inp" value="${S.blendedCAC}" min="0" step="0.01"
+            onchange="updateInput('blendedCAC', parseFloat(this.value)||0)">
+          <span class="inp-unit">£</span>
+        </div>
+        <div class="input-row">
+          <span class="input-label">New Customer AOV</span>
+          <input type="number" class="inp" value="${S.newCustomerAOV}" min="0" step="0.5"
+            onchange="updateInput('newCustomerAOV', parseFloat(this.value)||0)">
+          <span class="inp-unit">£</span>
+        </div>
+        <div class="input-row">
+          <span class="input-label">Repeat / Sub Order AOV</span>
+          <input type="number" class="inp" value="${S.repeatOrderAOV}" min="0" step="0.5"
+            onchange="updateInput('repeatOrderAOV', parseFloat(this.value)||0)">
+          <span class="inp-unit">£</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-8">Derived Metrics</div>
+        <table style="font-size:13px">
+          <tbody>
+            <tr><td>2027 required vs 2026 estimate</td><td style="text-align:right;font-weight:600;color:var(--amber)">${data.nc2026Multiplier_S3 !== null ? '×'+data.nc2026Multiplier_S3.toFixed(1) : '—'} (${fmtN(data.NC_2026_ACTUAL)} base)</td></tr>
+            <tr><td>Implied Acquisition Budget</td><td style="text-align:right;font-weight:600">${fmt(data.impliedBudget)}</td></tr>
+            <tr><td>Blended CAC Check</td><td style="text-align:right;font-weight:600">£${S.blendedCAC.toFixed(2)}</td></tr>
+            <tr><td>New Customer Revenue (M0 only)</td><td style="text-align:right;font-weight:600">${fmt(data.monthlyNC.reduce((a,n)=>a+n*S.newCustomerAOV,0))}</td></tr>
+            <tr><td>Retention Revenue (M1+)</td><td style="text-align:right;font-weight:600">${fmt(data.immuneMonthly.reduce((a,b)=>a+b,0) - data.monthlyNC.reduce((a,n)=>a+n*S.newCustomerAOV,0))}</td></tr>
+          </tbody>
+        </table>
+
+        <div class="card-title mt-16 mb-8">Channel Split (Reporting)</div>
+        <div class="input-row">
+          <span class="input-label">Paid Media</span>
+          <input type="number" class="inp" value="${(S.paidMediaShare*100).toFixed(0)}" min="0" max="100" step="1"
+            onchange="updateInput('paidMediaShare', parseFloat(this.value)/100||0)">
+          <span class="inp-unit">%</span>
+        </div>
+        <div class="input-row">
+          <span class="input-label">SEO</span>
+          <input type="number" class="inp" value="${(S.seoShare*100).toFixed(0)}" min="0" max="100" step="1"
+            onchange="updateInput('seoShare', parseFloat(this.value)/100||0)">
+          <span class="inp-unit">%</span>
+        </div>
+        <div class="input-row">
+          <span class="input-label">GEO</span>
+          <input type="number" class="inp" value="${(S.geoShare*100).toFixed(0)}" min="0" max="100" step="1"
+            onchange="updateInput('geoShare', parseFloat(this.value)/100||0)">
+          <span class="inp-unit">%</span>
+        </div>
+        <div style="font-size:11px;color:${Math.abs((S.paidMediaShare+S.seoShare+S.geoShare)-1)<0.01?'var(--green)':'var(--red)'}">
+          Total: ${fmtPctRaw(S.paidMediaShare+S.seoShare+S.geoShare)} ${Math.abs((S.paidMediaShare+S.seoShare+S.geoShare)-1)<0.01?'✓':'⚠ must sum to 100%'}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title mb-12">Monthly New Customers + Channel Attribution</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Month</th>
+              <th>Seas. Weight</th>
+              <th>New Customers</th>
+              <th>Paid Media</th>
+              <th>SEO</th>
+              <th>GEO</th>
+              <th>Implied Budget</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${MO.map((mo,m)=>`<tr>
+              <td>${mo} 2027</td>
+              <td>${(SEAS[m]*100).toFixed(1)}%</td>
+              <td>${fmtN(data.monthlyNC[m])}</td>
+              <td>${fmtN(data.channel.paid[m])}</td>
+              <td>${fmtN(data.channel.seo[m])}</td>
+              <td>${fmtN(data.channel.geo[m])}</td>
+              <td>${fmt(data.monthlyNC[m]*S.blendedCAC)}</td>
+            </tr>`).join('')}
+          </tbody>
+          <tfoot>
+            <tr class="tfoot-row">
+              <td>Full Year</td>
+              <td>100%</td>
+              <td>${fmtN(data.totalNC)}</td>
+              <td>${fmtN(paidSum)}</td>
+              <td>${fmtN(seoSum)}</td>
+              <td>${fmtN(geoSum)}</td>
+              <td>${fmt(data.impliedBudget)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ─── MODEL INPUTS TAB ───────────────────────────────────────── */
+let inputsFilter = 'all';
+
+function renderInputs(data) {
+  if (!data) data = compute();
+  const el = document.getElementById('tab-inputs');
+
+  const cats = ['all','measured','inferred','assumption','decision'];
+  const filterBtns = cats.map(c => `
+    <button class="filter-btn ${inputsFilter===c?'active':''}" onclick="setInputsFilter('${c}')">${c==='all'?'All':c.charAt(0).toUpperCase()+c.slice(1)}</button>
+  `).join('');
+
+  const rows = Object.entries(INPUT_META)
+    .filter(([k,m]) => inputsFilter === 'all' || m.category === inputsFilter)
+    .map(([key, meta]) => {
+      const val = S[key];
+      const isTBD = val === null || val === undefined;
+      const isNull = isTBD && meta.tbd;
+      let displayVal = '';
+      if (!isTBD) {
+        if (meta.unit === '%') displayVal = (val*100).toFixed(2);
+        else displayVal = val;
+      }
+      return `
+        <tr>
+          <td style="font-family:monospace;font-size:11px;color:var(--dim)">${key}</td>
+          <td>${meta.label}</td>
+          <td><span class="badge badge-${meta.category}">${meta.category}</span></td>
+          <td>
+            <input type="number" class="inp-inline ${isTBD?'tbd':''}"
+              value="${isTBD ? '' : displayVal}"
+              placeholder="${isTBD ? 'TBD' : ''}"
+              onchange="handleInputsTableChange('${key}', this.value, '${meta.unit}')">
+            ${meta.unit==='%'?'<span style="color:var(--dim);font-size:11px"> %</span>'
+              : meta.unit && meta.unit!=='' && meta.unit!=='index' && meta.unit!=='customers' && meta.unit!=='' ? `<span style="color:var(--dim);font-size:11px"> ${meta.unit}</span>` : ''}
+            ${isTBD ? '' : `<button class="set-tbd-btn" onclick="clearToTBD('${key}')">TBD</button>`}
+          </td>
+          <td class="inp-source">${meta.source}</td>
+          <td style="color:var(--muted);font-size:11px">${meta.review_date}</td>
+          <td class="inp-notes">${meta.notes}</td>
+        </tr>
+      `;
+    }).join('');
+
+  el.innerHTML = `
+    <div class="flex gap-16 items-center mb-16">
+      <div class="filter-bar" style="margin-bottom:0">${filterBtns}</div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="header-btn" onclick="exportModel()">Export JSON</button>
+        <button class="header-btn" onclick="document.getElementById('import-file-input').click()">Import JSON</button>
+        <button class="header-btn danger" onclick="resetModel()">Reset to Defaults</button>
+      </div>
+    </div>
+    <div class="note-box mb-16">
+      Category key: <span class="badge badge-measured">measured</span> from actual data &nbsp;
+      <span class="badge badge-inferred">inferred</span> derived/estimated &nbsp;
+      <span class="badge badge-assumption">assumption</span> working assumption &nbsp;
+      <span class="badge badge-decision">decision</span> deliberate strategic choice &nbsp;
+      <span class="badge badge-tbd">TBD</span> needs input before reliable
+    </div>
+    <details class="mb-20" open style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:0;overflow:hidden">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;user-select:none">
+        <span style="font-size:14px;color:var(--dim)">▸</span>
+        Efficiency Levers — CRO &amp; CRM
+        <span style="font-weight:400;color:var(--dim);font-size:11px;margin-left:4px">All default 0% · adjusting reduces the acquisition ×${data.nc2026Multiplier_S3 !== null ? data.nc2026Multiplier_S3.toFixed(1) : '3.1'} multiplier</span>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:16px 20px">
+        <div class="note-box" style="margin-bottom:16px">
+          <strong>These levers quantify efficiency initiatives not yet scoped or costed.</strong>
+          Default is 0% (no improvement assumed). Change any lever to see the revenue and NC impact — do not treat non-zero values as the working forecast until initiatives are properly costed.
+        </div>
+        <div class="grid-3">
+          ${efficiencySlider(
+            'croUplift',
+            'CRO — CVR Improvement',
+            '3.17% CVR',
+            `${(data.BASE_CVR*100).toFixed(2)}% → ${(data.effectiveCVR*100).toFixed(2)}% · +${fmtN(data.effectiveTotalNC - data.totalNC)} NCs`,
+            50
+          )}
+          ${efficiencySlider(
+            'crmRetentionUplift',
+            'CRM — Retention Rate Improvement',
+            `M1 ${S.m1RetentionEnd !== null ? (S.m1RetentionEnd*100).toFixed(1) : '?'}% · 90d ${S.retention60_90End !== null ? (S.retention60_90End*100).toFixed(1) : '?'}%`,
+            `M1 → ${data.effectiveM1End !== null ? (data.effectiveM1End*100).toFixed(1) : '—'}% · 90d → ${data.effectiveR60End !== null ? (data.effectiveR60End*100).toFixed(1) : '—'}%`,
+            20
+          )}
+          ${efficiencySlider(
+            'crmSubConvUplift',
+            'CRM — Subscription Conversion Improvement',
+            `${(S.subRateAtAcquisitionEnd*100).toFixed(1)}% sub rate`,
+            `${(S.subRateAtAcquisitionEnd*100).toFixed(1)}% → ${(data.effectiveSubRateEnd*100).toFixed(1)}%`,
+            20
+          )}
+        </div>
+      </div>
+    </details>
+
+    <div class="card mb-20" style="border-color:var(--amber-border);background:var(--amber-light)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#92400e;margin-bottom:14px">
+        Open Items — Pending Before Model Is Final
+      </div>
+      <div class="table-wrap">
+      <table style="font-size:12px">
+        <thead>
+          <tr>
+            <th style="text-align:left">Item</th>
+            <th style="text-align:left">Status</th>
+            <th style="text-align:left">Impact on model</th>
+            <th style="text-align:left">Review date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--text)">2027 CRM efficiency gains</td>
+            <td style="padding:8px 10px"><span class="badge badge-tbd">Not modelled</span></td>
+            <td style="padding:8px 10px;color:var(--muted)">2026 equivalent reduced new customer dependency. 2027 initiatives need scoping and costing before the acquisition residual (×${data.nc2026Multiplier_S3 !== null ? data.nc2026Multiplier_S3.toFixed(1) : '3.1'}) is treated as final. Reduces required NC directly once costed.</td>
+            <td style="padding:8px 10px;color:var(--muted)">2027-Q1</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--text)">2027 CRO / UX initiatives</td>
+            <td style="padding:8px 10px"><span class="badge badge-tbd">Not modelled</span></td>
+            <td style="padding:8px 10px;color:var(--muted)">Subscription rate at acquisition (17%→30%) is already in the model as the primary lever. On-site conversion improvements sit separately and are not yet costed — would reduce required acquisition volume or improve per-NC LTV.</td>
+            <td style="padding:8px 10px;color:var(--muted)">2027-Q1</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--text)">M1 retention end-state</td>
+            <td style="padding:8px 10px"><span class="badge badge-tbd">TBD</span></td>
+            <td style="padding:8px 10px;color:var(--muted)">Slider is live (currently ${(S.m1RetentionEnd*100).toFixed(0)}%). Target not yet confirmed by growth team. S3 (22%) vs S9 (35%) saves only ~${data.ncS3vsS9Delta !== null ? fmtN(data.ncS3vsS9Delta) : '770'} NCs — retention is a secondary lever vs volume.</td>
+            <td style="padding:8px 10px;color:var(--muted)">2027-Q1</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--text)">90-day retention end-state</td>
+            <td style="padding:8px 10px"><span class="badge badge-tbd">TBD</span></td>
+            <td style="padding:8px 10px;color:var(--muted)">Slider is live (currently ${(S.retention60_90End*100).toFixed(0)}%). Feeds Phase 1 and Phase 2 anchor scaling via r3Scale. Same caveat as M1 — confirm with growth team before treating as plan input.</td>
+            <td style="padding:8px 10px;color:var(--muted)">2027-Q1</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;font-weight:600;color:var(--text)">Shopify / Growth Room NC sync gap</td>
+            <td style="padding:8px 10px"><span class="badge badge-inferred">Unresolved</span></td>
+            <td style="padding:8px 10px;color:var(--muted)">2025 full-year: DB-confirmed 4,912 vs Growth Room reported figure — gap of ~800 customers (~16%). Likely Shopify sync lag. Model uses DB-confirmed figure (conservative). If Growth Room is correct, 2026 actual base rises above 3,970 and the 2027 multiplier falls. Resolve before 2027 plan is locked.</td>
+            <td style="padding:8px 10px;color:var(--muted)">2026-12-31</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <details class="mb-20" style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:0;overflow:hidden">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px;user-select:none">
+        <span style="font-size:14px;color:var(--dim)">▸</span>
+        Model Notes <span style="font-weight:400;color:var(--dim)">(${(data.flags||[]).length} items — carry-forward methodology, stream architecture, SNOOZE mechanic, FOCUS sub-mix)</span>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:16px 20px;display:flex;flex-direction:column;gap:10px">
+        ${(data.flags||[]).map((f,i) => `
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px">
+            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);display:block;margin-bottom:4px">Note ${i+1}</span>
+            ${f}
+          </div>
+        `).join('')}
+      </div>
+    </details>
+
+    <div class="inputs-table-wrap">
+      <table class="inputs-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Input</th>
+            <th>Category</th>
+            <th>Value</th>
+            <th>Source</th>
+            <th>Review Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+  setupRampSliderListeners();
+}
+
+function setInputsFilter(cat) {
+  inputsFilter = cat;
+  renderInputs();
+}
+
+function handleInputsTableChange(key, raw, unit) {
+  const trimmed = raw.trim();
+  if (trimmed === '' || trimmed.toLowerCase() === 'tbd') {
+    updateInput(key, null);
+    return;
+  }
+  const v = parseFloat(trimmed);
+  if (isNaN(v)) return;
+  const finalVal = unit === '%' ? v / 100 : v;
+  updateInput(key, finalVal);
+}
+
+/* ─── EXPORT / IMPORT / RESET ────────────────────────────────── */
+function exportModel() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `leapfrog-2027-cohort-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importModel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      for (const key of Object.keys(INPUT_META)) {
+        if (key in imported) S[key] = imported[key];
+      }
+      saveState();
+      const data = compute();
+      renderAll(data);
+    } catch(err) {
+      alert('Import failed: invalid JSON file');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetModel() {
+  if (!confirm('Reset all inputs to defaults? This cannot be undone.')) return;
+  for (const key of Object.keys(INPUT_META)) {
+    S[key] = getDefault(key);
+  }
+  saveState();
+  const data = compute();
+  renderAll(data);
+}
+
+/* ─── TAB NAVIGATION ─────────────────────────────────────────── */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+  if (btn) btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  const data = compute();
+  renderTabContent(tab, data);
+}
+
+function setupTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+}
+
+/* ─── INIT ───────────────────────────────────────────────────── */
+initState();
+setupTabs();
+const initialData = compute();
+renderAll(initialData);
+</script>
+</body>
+</html>
